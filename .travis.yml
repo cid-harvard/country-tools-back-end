@@ -1,3 +1,9 @@
+language: node_js
+node_js:
+- node
+env:
+  - SERVER_IP_ADDRESS=3.90.254.42
+
 before_install:
 - openssl aes-256-cbc -K $encrypted_4df03c4dcdbb_key -iv $encrypted_4df03c4dcdbb_iv
   -in deploy_key.enc -out ./deploy_key -d
@@ -5,4 +11,4 @@ before_install:
 - chmod 600 ./deploy_key
 - echo -e "Host $SERVER_IP_ADDRESS\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 - ssh-add ./deploy_key
-- ssh -i ./deploy_key root@3.90.254.42 pwd
+- ssh -i ./deploy_key root@$SERVER_IP_ADDRESS pwd
