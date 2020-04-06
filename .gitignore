@@ -1,5 +1,11 @@
+# Data
+raw_data/
+processed_data/
+
 # TravisCI deployment key
 deploy_key
+staging_key
+prod_key
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

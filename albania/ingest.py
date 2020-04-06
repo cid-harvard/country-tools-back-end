@@ -103,16 +103,40 @@ def fdi_countries_to_loc_class(fdi, loc):
 
 
 if __name__ == "__main__":
-    nace = classification.load("industry/NACE/Albania/out/nace_industries.csv")
+    nace = classification.load("industry/NACE/Albania/out/nace_industries.csv").table
     alb_countries = classification.load(
         "location/International/Atlas/out/locations_international_atlas.csv"
     ).table
 
     alb_countries = pd.concat([alb_countries, ADDITIONAL_COUNTRIES])
+    alb_countries = alb_countries.reset_index().rename(columns={"index": "location_id"})
+    alb_countries = alb_countries[
+        [
+            "location_id",
+            "code",
+            "level",
+            "name_en",
+            "name_short_en",
+            "iso2",
+            "parent_id",
+            "name",
+            "is_trusted",
+            "in_rankings",
+            "reported_serv",
+            "reported_serv_recent",
+            "former_country",
+        ]
+    ]
 
-    fdi = pd.read_csv("./raw_data/FDI_Markets_for_filters.csv")
+    nace = nace.reset_index().rename(columns={"index": "nace_id"})
+    nace.to_csv("./processed_data/nace_industry.csv", index=False)
+    alb_countries.to_csv("./processed_data/country.csv", index=False)
+
+    fdi = pd.read_csv("./raw_data/fDiMarkets_nace_companies_march27.csv")
     fdi.columns = [
-        "subsector",
+        "code",
+        "nace_digits",
+        "name",
         "parent_company",
         "source_country",
         "source_city",
@@ -125,5 +149,26 @@ if __name__ == "__main__":
     ]
 
     fdi_countries = fdi_countries_to_loc_class(fdi, alb_countries)
-
     fdi = fdi.merge(fdi_countries, on="source_country", how="left")
+
+    nace_group = nace[nace.level == "group"]
+    nace_group.code = nace_group.code.astype(float)
+    fdi = fdi.merge(nace_group, on="code", how="left")
+
+    fdi = fdi[
+        [
+            "parent_company",
+            "source_country",
+            "source_city",
+            "capex_world",
+            "capex_europe",
+            "capex_balkans",
+            "projects_world",
+            "projects_europe",
+            "projects_balkans",
+            "location_id",
+            "nace_id",
+        ]
+    ]
+
+    fdi.to_csv("./processed_data/fdi_markets.csv", index=False)
