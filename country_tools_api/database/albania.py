@@ -10,6 +10,7 @@ from sqlalchemy import (
     PrimaryKeyConstraint,
     ForeignKeyConstraint,
 )
+from sqlalchemy.orm import relationship
 
 
 class NACEIndustry(Base):

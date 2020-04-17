@@ -1,16 +1,17 @@
-from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 import graphene
-from graphene import String, Int, Boolean, Float
+from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
+from sqlalchemy.orm import scoped_session, sessionmaker
 
+from database.base import db_session
 from database import albania
 
 # NACE Industry
 class NACEIndustryAttribute:
-    nace_id = String()
-    level = String()
-    code = String()
-    name = String()
-    parent_id = String()
+    nace_id = graphene.String()
+    level = graphene.String()
+    code = graphene.String()
+    name = graphene.String()
+    parent_id = graphene.String()
 
 
 class NACEIndustry(SQLAlchemyObjectType, NACEIndustryAttribute):
@@ -21,19 +22,19 @@ class NACEIndustry(SQLAlchemyObjectType, NACEIndustryAttribute):
 
 # Country
 class CountryAttribute:
-    location_id = Int()
-    code = String()
-    level = String()
-    name_en = String()
-    name_short_en = String()
-    iso2 = String()
-    parent_id = String()
-    name = String()
-    is_trusted = Boolean()
-    in_rankings = Boolean()
-    reported_serv = Boolean()
-    reported_serv_recent = Boolean()
-    former_country = Boolean()
+    location_id = graphene.Int()
+    code = graphene.String()
+    level = graphene.String()
+    name_en = graphene.String()
+    name_short_en = graphene.String()
+    iso2 = graphene.String()
+    parent_id = graphene.String()
+    name = graphene.String()
+    is_trusted = graphene.Boolean()
+    in_rankings = graphene.Boolean()
+    reported_serv = graphene.Boolean()
+    reported_serv_recent = graphene.Boolean()
+    former_country = graphene.Boolean()
 
 
 class Country(SQLAlchemyObjectType, CountryAttribute):
@@ -44,17 +45,17 @@ class Country(SQLAlchemyObjectType, CountryAttribute):
 
 # FDI Markets
 class FDIMarketsAttribute:
-    nace_id = String()
-    location_id = Int()
-    parent_company = String()
-    source_country = String()
-    source_city = String()
-    capex_world = Float()
-    capex_europe = Float()
-    capex_balkans = Float()
-    projects_world = Int()
-    projects_europe = Int()
-    projects_balkans = Int()
+    nace_id = graphene.String()
+    location_id = graphene.Int()
+    parent_company = graphene.String()
+    source_country = graphene.String()
+    source_city = graphene.String()
+    capex_world = graphene.Float()
+    capex_europe = graphene.Float()
+    capex_balkans = graphene.Float()
+    projects_world = graphene.Int()
+    projects_europe = graphene.Int()
+    projects_balkans = graphene.Int()
 
 
 class FDIMarkets(SQLAlchemyObjectType, FDIMarketsAttribute):
@@ -65,12 +66,12 @@ class FDIMarkets(SQLAlchemyObjectType, FDIMarketsAttribute):
 
 # FDI Markets Overtime
 class FDIMarketsOvertimeAttribute:
-    nace_id = String()
-    destination = String()
-    projects_03_06 = Int()
-    projects_07_10 = Int()
-    projects_11_14 = Int()
-    projects_15_18 = Int()
+    nace_id = graphene.String()
+    destination = graphene.String()
+    projects_03_06 = graphene.Int()
+    projects_07_10 = graphene.Int()
+    projects_11_14 = graphene.Int()
+    projects_15_18 = graphene.Int()
 
 
 class FDIMarketsOvertime(SQLAlchemyObjectType, FDIMarketsOvertimeAttribute):
@@ -81,23 +82,23 @@ class FDIMarketsOvertime(SQLAlchemyObjectType, FDIMarketsOvertimeAttribute):
 
 # Viability
 class FactorsAttribute:
-    nace_id = String()
-    rca = String()
-    v_rca = Int()
-    v_dist = Int()
-    v_fdipeers = Int()
-    v_contracts = Int()
-    v_elect = Int()
-    avg_viability = Float()
-    a_youth = Int()
-    a_wage = Int()
-    a_fdiworld = Int()
-    a_export = Int()
-    avg_attractiveness = Float()
-    v_text = String()
-    a_text = String()
-    rca_text1 = String()
-    rca_text2 = String()
+    nace_id = graphene.String()
+    rca = graphene.String()
+    v_rca = graphene.Int()
+    v_dist = graphene.Int()
+    v_fdipeers = graphene.Int()
+    v_contracts = graphene.Int()
+    v_elect = graphene.Int()
+    avg_viability = graphene.Float()
+    a_youth = graphene.Int()
+    a_wage = graphene.Int()
+    a_fdiworld = graphene.Int()
+    a_export = graphene.Int()
+    avg_attractiveness = graphene.Float()
+    v_text = graphene.String()
+    a_text = graphene.String()
+    rca_text1 = graphene.String()
+    rca_text2 = graphene.String()
 
 
 class Factors(SQLAlchemyObjectType, FactorsAttribute):
@@ -115,18 +116,42 @@ class Script(SQLAlchemyObjectType):
 class Query(graphene.ObjectType):
     """Query objects for GraphQL API."""
 
-    node = graphene.relay.Node.Field()
-    nace_industry = graphene.relay.Node.Field(NACEIndustry)
-    nace_industry_list = SQLAlchemyConnectionField(NACEIndustry)
-    country = graphene.relay.Node.Field(Country)
-    country_list = SQLAlchemyConnectionField(Country)
-    fdi_markets = graphene.relay.Node.Field(FDIMarkets)
-    fdi_markets_list = SQLAlchemyConnectionField(FDIMarkets)
-    fdi_markets_overtime = graphene.relay.Node.Field(FDIMarketsOvertime)
-    fdi_markets_overtime_list = SQLAlchemyConnectionField(FDIMarketsOvertime)
-    factors = graphene.relay.Node.Field(Factors)
-    factors_list = SQLAlchemyConnectionField(Factors)
-    script = SQLAlchemyConnectionField(Script)
+    nace_industry = graphene.List(NACEIndustry, nace_id=graphene.Int())
+    country = graphene.List(Country, location_id=graphene.Int())
+    fdi_markets = graphene.List(FDIMarkets, nace_id=graphene.Int())
+    fdi_markets_overtime = graphene.List(FDIMarketsOvertime, nace_id=graphene.Int())
+    factors = graphene.List(Factors, nace_id=graphene.Int())
+    script = graphene.List(Script)
+
+    def resolve_nace_industry(self, info, **args):
+        query = db_session.query(albania.NACEIndustry).filter(
+            getattr(albania.NACEIndustry, "nace_id") == args["nace_id"]
+        )
+        return query
+
+    def resolve_country(self, info, **args):
+        query = db_session.query(albania.Country).filter(
+            getattr(albania.Country, "location_id") == args["location_id"]
+        )
+        return query
+
+    def resolve_fdi_markets(self, info, **args):
+        query = db_session.query(albania.FDIMarkets).filter(
+            getattr(albania.FDIMarkets, "nace_id") == args["nace_id"]
+        )
+        return query
+
+    def resolve_fdi_markets_overtime(self, info, **args):
+        query = db_session.query(albania.FDIMarketsOvertime).filter(
+            getattr(albania.FDIMarketsOvertime, "nace_id") == args["nace_id"]
+        )
+        return query
+
+    def resolve_factors(self, info, **args):
+        query = db_session.query(albania.Factors).filter(
+            getattr(albania.Factors, "nace_id") == args["nace_id"]
+        )
+        return query
 
 
 schema = graphene.Schema(query=Query)
