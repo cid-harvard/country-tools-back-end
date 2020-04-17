@@ -54,20 +54,23 @@ class Script(SQLAlchemyObjectType):
 class Query(graphene.ObjectType):
     """Query objects for GraphQL API."""
 
-    nace_industry = graphene.List(NACEIndustry, nace_id=graphene.Int())
+    nace_industry_list = graphene.List(NACEIndustry)
+    nace_industry = graphene.Field(NACEIndustry, nace_id=graphene.Int(required=True))
     country = graphene.List(Country, location_id=graphene.Int())
     fdi_markets = graphene.List(FDIMarkets, nace_id=graphene.Int())
     fdi_markets_overtime = graphene.List(FDIMarketsOvertime, nace_id=graphene.Int())
     factors = graphene.List(Factors, nace_id=graphene.Int())
     script = graphene.List(Script)
 
+    def resolve_nace_industry_list(self, info, **args):
+        return db_session.query(albania.NACEIndustry)
+
     def resolve_nace_industry(self, info, **args):
-        query = db_session.query(albania.NACEIndustry)
-        if "nace_id" in args:
-            query = query.filter(
-                getattr(albania.NACEIndustry, "nace_id") == args["nace_id"]
-            )
-        return query
+        return (
+            db_session.query(albania.NACEIndustry)
+            .filter(getattr(albania.NACEIndustry, "nace_id") == args["nace_id"])
+            .one()
+        )
 
     def resolve_country(self, info, **args):
         query = db_session.query(albania.Country)
