@@ -1,95 +1,114 @@
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 import graphene
+from graphene import String, Int, Boolean, Float
 
-from database.albania import *
+from database import albania
 
 # NACE Industry
 class NACEIndustryAttribute:
-    nace_id = graphene.String()
-    level = graphene.String()
-    code = graphene.String()
-    name = graphene.String()
-    parent_id = graphene.String()
+    nace_id = String()
+    level = String()
+    code = String()
+    name = String()
+    parent_id = String()
 
 
 class NACEIndustry(SQLAlchemyObjectType, NACEIndustryAttribute):
     class Meta:
-        model = NACEIndustry
+        model = albania.NACEIndustry
         interfaces = (graphene.relay.Node,)
 
 
 # Country
 class CountryAttribute:
-    location_id = graphene.String()
-    code = graphene.String()
-    level = graphene.String()
-    name_en = graphene.String()
-    name_short_en = graphene.String()
-    iso2 = graphene.String()
-    parent_id = graphene.String()
-    name = graphene.String()
-    is_trusted = graphene.String()
-    in_rankings = graphene.String()
-    reported_serv = graphene.String()
-    reported_serv_recent = graphene.String()
-    former_country = graphene.String()
+    location_id = Int()
+    code = String()
+    level = String()
+    name_en = String()
+    name_short_en = String()
+    iso2 = String()
+    parent_id = String()
+    name = String()
+    is_trusted = Boolean()
+    in_rankings = Boolean()
+    reported_serv = Boolean()
+    reported_serv_recent = Boolean()
+    former_country = Boolean()
 
 
 class Country(SQLAlchemyObjectType, CountryAttribute):
     class Meta:
-        model = Country
+        model = albania.Country
         interfaces = (graphene.relay.Node,)
 
 
 # FDI Markets
 class FDIMarketsAttribute:
-    nace_id = graphene.String()
-    location_id = graphene.String()
-    parent_company = graphene.String()
-    source_country = graphene.String()
-    source_city = graphene.String()
-    capex_world = graphene.String()
-    capex_europe = graphene.String()
-    capex_balkans = graphene.String()
-    projects_world = graphene.String()
-    projects_europe = graphene.String()
-    projects_balkans = graphene.String()
+    nace_id = String()
+    location_id = Int()
+    parent_company = String()
+    source_country = String()
+    source_city = String()
+    capex_world = Float()
+    capex_europe = Float()
+    capex_balkans = Float()
+    projects_world = Int()
+    projects_europe = Int()
+    projects_balkans = Int()
 
 
 class FDIMarkets(SQLAlchemyObjectType, FDIMarketsAttribute):
     class Meta:
-        model = FDIMarkets
+        model = albania.FDIMarkets
         interfaces = (graphene.relay.Node,)
 
 
 # FDI Markets Overtime
 class FDIMarketsOvertimeAttribute:
-    nace_id = graphene.String()
-    destination = graphene.String()
-    projects_03_06 = graphene.String()
-    projects_07_10 = graphene.String()
-    projects_11_14 = graphene.String()
-    projects_15_18 = graphene.String()
+    nace_id = String()
+    destination = String()
+    projects_03_06 = Int()
+    projects_07_10 = Int()
+    projects_11_14 = Int()
+    projects_15_18 = Int()
 
 
 class FDIMarketsOvertime(SQLAlchemyObjectType, FDIMarketsOvertimeAttribute):
     class Meta:
-        model = FDIMarketsOvertime
+        model = albania.FDIMarketsOvertime
         interfaces = (graphene.relay.Node,)
 
 
 # Viability
-class ViabilityAttribute:
-    nace_id = graphene.String()
-    score_rca = graphene.String()
-    score_dist = graphene.String()
-    score_fdipeers = graphene.String()
-    score_contracts = graphene.String()
+class FactorsAttribute:
+    nace_id = String()
+    rca = String()
+    v_rca = Int()
+    v_dist = Int()
+    v_fdipeers = Int()
+    v_contracts = Int()
+    v_elect = Int()
+    avg_viability = Float()
+    a_youth = Int()
+    a_wage = Int()
+    a_fdiworld = Int()
+    a_export = Int()
+    avg_attractiveness = Float()
+    v_text = String()
+    a_text = String()
+    rca_text1 = String()
+    rca_text2 = String()
 
 
-class Viability(SQLAlchemyObjectType, ViabilityAttribute):
+class Factors(SQLAlchemyObjectType, FactorsAttribute):
     class Meta:
-        model = Viability
+        model = albania.Factors
+        interfaces = (graphene.relay.Node,)
+
+
+class Script(SQLAlchemyObjectType):
+    class Meta:
+        model = albania.Script
         interfaces = (graphene.relay.Node,)
 
 
@@ -99,6 +118,15 @@ class Query(graphene.ObjectType):
     node = graphene.relay.Node.Field()
     nace_industry = graphene.relay.Node.Field(NACEIndustry)
     nace_industry_list = SQLAlchemyConnectionField(NACEIndustry)
+    country = graphene.relay.Node.Field(Country)
+    country_list = SQLAlchemyConnectionField(Country)
+    fdi_markets = graphene.relay.Node.Field(FDIMarkets)
+    fdi_markets_list = SQLAlchemyConnectionField(FDIMarkets)
+    fdi_markets_overtime = graphene.relay.Node.Field(FDIMarketsOvertime)
+    fdi_markets_overtime_list = SQLAlchemyConnectionField(FDIMarketsOvertime)
+    factors = graphene.relay.Node.Field(Factors)
+    factors_list = SQLAlchemyConnectionField(Factors)
+    script = SQLAlchemyConnectionField(Script)
 
 
 schema = graphene.Schema(query=Query)

@@ -16,7 +16,7 @@ class NACEIndustry(Base):
 
     __tablename__ = "nace_industry"
 
-    nace_id = Column(Integer, primary_key=True)
+    nace_id = Column(String, primary_key=True)
     level = Column(Enum(*["section", "division", "group"], name="industry_level"))
     code = Column(String)
     name = Column(String)
@@ -68,10 +68,11 @@ class FDIMarkets(Base):
 class FDIMarketsOvertime(Base):
 
     __tablename__ = "fdi_markets_overtime"
+    __table_args__ = (PrimaryKeyConstraint("nace_id", "destination"), {})
 
-    nace_id = Column(Integer, primary_key=True)
+    nace_id = Column(Integer)
     destination = Column(
-        Enum(*["balkans", "rest_europe", "rest_world"], name="destination")
+        Enum(*["Balkans", "Rest of Europe", "Rest of World"], name="destination")
     )
     projects_03_06 = Column(Integer)
     projects_07_10 = Column(Integer)
@@ -79,17 +80,34 @@ class FDIMarketsOvertime(Base):
     projects_15_18 = Column(Integer)
 
 
-class Viability(Base):
+class Factors(Base):
 
-    __tablename__ = "viability"
+    __tablename__ = "factors"
 
     nace_id = Column(Integer, primary_key=True)
-    score_rca = Column(Integer)
-    score_dist = Column(Integer)
-    score_fdipeers = Column(Integer)
-    score_contracts = Column(Integer)
+    rca = Column(Enum(*[">= 1", "< 1"], name="rca"))
+    v_rca = Column(Integer)
+    v_dist = Column(Integer)
+    v_fdipeers = Column(Integer)
+    v_contracts = Column(Integer)
+    v_elect = Column(Integer)
+    avg_viability = Column(Float)
+    a_youth = Column(Integer)
+    a_wage = Column(Integer)
+    a_fdiworld = Column(Integer)
+    a_export = Column(Integer)
+    avg_attractiveness = Column(Float)
+    v_text = Column(String)
+    a_text = Column(String)
+    rca_text1 = Column(String)
+    rca_text2 = Column(String)
 
 
-# class Attractiveness(Base):
+class Script(Base):
 
-#     __tablename__ = "attractiveness"
+    __tablename__ = "script"
+    __table_args__ = (PrimaryKeyConstraint("section", "subsection"), {})
+
+    section = Column(String)
+    subsection = Column(String)
+    text = Column(String)

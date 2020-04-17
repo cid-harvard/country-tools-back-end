@@ -108,6 +108,7 @@ if __name__ == "__main__":
         "location/International/Atlas/out/locations_international_atlas.csv"
     ).table
 
+    # Map countries from FDI set to Location IDs
     alb_countries = pd.concat([alb_countries, ADDITIONAL_COUNTRIES])
     alb_countries = alb_countries.reset_index().rename(columns={"index": "location_id"})
     alb_countries = alb_countries[
@@ -127,11 +128,17 @@ if __name__ == "__main__":
             "former_country",
         ]
     ]
-
-    nace = nace.reset_index().rename(columns={"index": "nace_id"})
-    nace.to_csv("./processed_data/nace_industry.csv", index=False)
     alb_countries.to_csv("./processed_data/country.csv", index=False)
 
+    # Process NACE to table
+    nace = nace.reset_index().rename(columns={"index": "nace_id"})
+    nace.to_csv("./processed_data/nace_industry.csv", index=False)
+
+    # Ingest script table
+    script = pd.read_csv("./raw_data/albania_script.csv")
+    script.to_csv("./processed_data/albania_script.csv", index=False)
+
+    # Ingest FDI data
     fdi = pd.read_csv("./raw_data/fDiMarkets_nace_companies_march27.csv")
     fdi.columns = [
         "code",
@@ -172,3 +179,49 @@ if __name__ == "__main__":
     ]
 
     fdi.to_csv("./processed_data/fdi_markets.csv", index=False)
+
+    # Ingest FDI over time data
+    fdi_time = pd.read_csv("./raw_data/fDiMarkets_nace_yeargroup_march27.csv")
+    fdi_time = fdi_time.merge(
+        nace_group, left_on="nacecode", right_on="code", how="left"
+    )[
+        [
+            "nace_id",
+            "dest",
+            "projects_03_06",
+            "projects_07_10",
+            "projects_11_14",
+            "projects_15_18",
+        ]
+    ]
+    fdi_time = fdi_time.rename(columns={"dest": "destination"})
+    fdi_time.to_csv("./processed_data/fdi_markets_overtime.csv", index=False)
+
+    # Ingest Viability and Attractiveness Factors
+    factors = pd.read_csv("./raw_data/combined_factors_april10.csv")
+    factors = factors.merge(
+        nace_group, left_on="description", right_on="name", how="left"
+    )[
+        [
+            "nace_id",
+            "rca",
+            "v_rca",
+            "v_dist",
+            "v_fdipeers",
+            "v_contracts",
+            "v_elect",
+            "avg_viability",
+            "a_youth",
+            "a_wage",
+            "a_fdiworld",
+            "a_export",
+            "avg_attractiveness",
+            "v_text",
+            "a_text",
+            "rca",
+            "rca_text1",
+            "rca_text2",
+        ]
+    ]
+    factors = factors.loc[:, ~factors.columns.duplicated()]
+    factors.to_csv("./processed_data/factors.csv", index=False)

@@ -24,3 +24,21 @@ with engine.connect() as c:
         conn=c,
         table_obj=meta.tables["fdi_markets"],
     ).copy()
+
+    DataFrameCopy(
+        pd.read_csv("./albania/processed_data/fdi_markets_overtime.csv"),
+        conn=c,
+        table_obj=meta.tables["fdi_markets_overtime"],
+    ).copy()
+
+    DataFrameCopy(
+        pd.read_csv("./albania/processed_data/factors.csv"),
+        conn=c,
+        table_obj=meta.tables["factors"],
+    ).copy()
+
+    DataFrameCopy(
+        pd.read_csv("./albania/processed_data/albania_script.csv"),
+        conn=c,
+        table_obj=meta.tables["script"],
+    ).copy()

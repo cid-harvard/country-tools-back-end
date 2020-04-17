@@ -2,7 +2,8 @@
 set -xe
 
 # Copy Travis build
-rsync -rq --delete --rsync-path="mkdir -p $APP_DIR/api && rsync" $TRAVIS_BUILD_DIR/country_tools_api $SERVER_USER@$SERVER_ADDRESS:$APP_DIR/backend
+scp ./requirements.txt $SERVER_USER@$SERVER_ADDRESS:$APP_DIR/api
+rsync -rq --delete --rsync-path="mkdir -p $APP_DIR/api && rsync" $TRAVIS_BUILD_DIR/country_tools_api $SERVER_USER@$SERVER_ADDRESS:$APP_DIR/api
 
 ssh $SERVER_USER@$SERVER_ADDRESS <<- EOF
 	sudo apt update

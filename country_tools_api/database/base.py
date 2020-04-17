@@ -5,7 +5,7 @@ import os
 
 # Create database engine
 db_user = "postgres"
-db_pass = "postgres"
+db_pass = ""
 db_host = "country-tools-staging.cppjqzftxysd.us-east-1.rds.amazonaws.com"
 db_name = "country_tools"
 db_uri = f"postgresql://{db_user}:{db_pass}@{db_host}/{db_name}"
