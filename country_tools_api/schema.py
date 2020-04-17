@@ -32,6 +32,7 @@ class FDIMarketsOvertime(SQLAlchemyObjectType):
         model = albania.FDIMarketsOvertime
         interfaces = (graphene.relay.Node,)
 
+    # Graphene can't handle enum options starting with non-alpha characters
     destination = graphene.String()
 
 
@@ -41,6 +42,7 @@ class Factors(SQLAlchemyObjectType):
         model = albania.Factors
         interfaces = (graphene.relay.Node,)
 
+    # Graphene can't handle enum options starting with non-alpha characters
     rca = graphene.String()
 
 
@@ -49,6 +51,13 @@ class Script(SQLAlchemyObjectType):
     class Meta:
         model = albania.Script
         interfaces = (graphene.relay.Node,)
+
+
+def sqlalchemy_filter(args, model, col):
+    query = db_session.query(model)
+    if col in args:
+        query = query.filter(getattr(model, col) == args[col])
+    return query
 
 
 class Query(graphene.ObjectType):
@@ -73,34 +82,19 @@ class Query(graphene.ObjectType):
         )
 
     def resolve_country(self, info, **args):
-        query = db_session.query(albania.Country)
-        if "location_id" in args:
-            query = query.filter(
-                getattr(albania.Country, "location_id") == args["location_id"]
-            )
-        return query
+        return sqlalchemy_filter(args, albania.Country, "location_id")
 
     def resolve_fdi_markets(self, info, **args):
-        query = db_session.query(albania.FDIMarkets)
-        if "nace_id" in args:
-            query = query.filter(
-                getattr(albania.FDIMarkets, "nace_id") == args["nace_id"]
-            )
-        return query
+        return sqlalchemy_filter(args, albania.FDIMarkets, "nace_id")
 
     def resolve_fdi_markets_overtime(self, info, **args):
-        query = db_session.query(albania.FDIMarketsOvertime)
-        if "nace_id" in args:
-            query = query.filter(
-                getattr(albania.FDIMarketsOvertime, "nace_id") == args["nace_id"]
-            )
-        return query
+        return sqlalchemy_filter(args, albania.FDIMarketsOvertime, "nace_id")
 
     def resolve_factors(self, info, **args):
-        query = db_session.query(albania.Factors)
-        if "nace_id" in args:
-            query = query.filter(getattr(albania.Factors, "nace_id") == args["nace_id"])
-        return query
+        return sqlalchemy_filter(args, albania.Factors, "nace_id")
+
+    def resolve_script(self, info, **args):
+        return db_session.query(albania.Script)
 
 
 schema = graphene.Schema(query=Query)
