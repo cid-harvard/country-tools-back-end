@@ -10,18 +10,7 @@ from sqlalchemy import (
     PrimaryKeyConstraint,
     ForeignKeyConstraint,
 )
-from sqlalchemy.orm import relationship
-
-
-class NACEIndustry(Base):
-
-    __tablename__ = "nace_industry"
-
-    nace_id = Column(String, primary_key=True)
-    level = Column(Enum(*["section", "division", "group"], name="industry_level"))
-    code = Column(String)
-    name = Column(String)
-    parent_id = Column(Integer)
+from sqlalchemy.orm import relationship, foreign
 
 
 class Country(Base):
@@ -64,6 +53,9 @@ class FDIMarkets(Base):
     projects_world = Column(Integer)
     projects_europe = Column(Integer)
     projects_balkans = Column(Integer)
+    country = relationship(
+        "Country", primaryjoin=(location_id == foreign(Country.location_id))
+    )
 
 
 class FDIMarketsOvertime(Base):
@@ -112,3 +104,22 @@ class Script(Base):
     section = Column(String)
     subsection = Column(String)
     text = Column(String)
+
+
+class NACEIndustry(Base):
+
+    __tablename__ = "nace_industry"
+
+    nace_id = Column(Integer, primary_key=True)
+    level = Column(Enum(*["section", "division", "group"], name="industry_level"))
+    code = Column(String)
+    name = Column(String)
+    parent_id = Column(Integer)
+    fdi_markets = relationship(
+        "FDIMarkets", primaryjoin=(nace_id == foreign(FDIMarkets.nace_id))
+    )
+    fdi_markets_overtime = relationship(
+        "FDIMarketsOvertime",
+        primaryjoin=(nace_id == foreign(FDIMarketsOvertime.nace_id)),
+    )
+    factors = relationship("Factors", primaryjoin=(nace_id == foreign(Factors.nace_id)))
