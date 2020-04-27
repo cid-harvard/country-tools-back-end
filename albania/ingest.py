@@ -1,5 +1,9 @@
 import pandas as pd
+import numpy as np
 from linnaeus import classification
+
+RAW_DATA_DIR = "./raw_data"
+PROCESSED_DATA_DIR = "./processed_data"
 
 MANUAL_MAPPINGS = {
     "Russia": 186,
@@ -128,18 +132,18 @@ if __name__ == "__main__":
             "former_country",
         ]
     ]
-    alb_countries.to_csv("./processed_data/country.csv", index=False)
+    alb_countries.to_csv(f"{PROCESSED_DATA_DIR}/country.csv", index=False)
 
     # Process NACE to table
     nace = nace.reset_index().rename(columns={"index": "nace_id"})
-    nace.to_csv("./processed_data/nace_industry.csv", index=False)
+    nace.to_csv(f"{PROCESSED_DATA_DIR}/nace_industry.csv", index=False)
 
     # Ingest script table
-    script = pd.read_csv("./raw_data/albania_script.csv")
-    script.to_csv("./processed_data/albania_script.csv", index=False)
+    script = pd.read_csv(f"{RAW_DATA_DIR}/albania_script.csv")
+    script.to_csv(f"{PROCESSED_DATA_DIR}/script.csv", index=False)
 
     # Ingest FDI data
-    fdi = pd.read_csv("./raw_data/fDiMarkets_nace_companies_march27.csv")
+    fdi = pd.read_csv(f"{RAW_DATA_DIR}/fDiMarkets_nace_companies_v2.csv")
     fdi.columns = [
         "code",
         "nace_digits",
@@ -153,16 +157,20 @@ if __name__ == "__main__":
         "projects_world",
         "projects_europe",
         "projects_balkans",
+        "avg_capex",
+        "avg_jobs",
     ]
 
     fdi_countries = fdi_countries_to_loc_class(fdi, alb_countries)
     fdi = fdi.merge(fdi_countries, on="source_country", how="left")
 
     nace_group = nace[nace.level == "group"]
-    nace_group.code = nace_group.code.astype(float)
-    fdi = fdi.merge(nace_group, on="code", how="left")
+    nace_group["code"] = nace_group.code.astype(float)
+    nace_group["code_int"] = (
+        nace_group.code.astype(str).str.replace(".", "").astype(int)
+    )
 
-    fdi = fdi[
+    fdi = fdi.merge(nace_group, on="code", how="left")[
         [
             "parent_company",
             "source_country",
@@ -173,15 +181,17 @@ if __name__ == "__main__":
             "projects_world",
             "projects_europe",
             "projects_balkans",
+            "avg_capex",
+            "avg_jobs",
             "location_id",
             "nace_id",
         ]
     ]
 
-    fdi.to_csv("./processed_data/fdi_markets.csv", index=False)
+    fdi.to_csv(f"{PROCESSED_DATA_DIR}/fdi_markets.csv", index=False)
 
     # Ingest FDI over time data
-    fdi_time = pd.read_csv("./raw_data/fDiMarkets_nace_yeargroup_march27.csv")
+    fdi_time = pd.read_csv(f"{RAW_DATA_DIR}/fDiMarkets_nace_yeargroup_march27.csv")
     fdi_time = fdi_time.merge(
         nace_group, left_on="nacecode", right_on="code", how="left"
     )[
@@ -195,10 +205,10 @@ if __name__ == "__main__":
         ]
     ]
     fdi_time = fdi_time.rename(columns={"dest": "destination"})
-    fdi_time.to_csv("./processed_data/fdi_markets_overtime.csv", index=False)
+    fdi_time.to_csv(f"{PROCESSED_DATA_DIR}/fdi_markets_overtime.csv", index=False)
 
     # Ingest Viability and Attractiveness Factors
-    factors = pd.read_csv("./raw_data/combined_factors_april10.csv")
+    factors = pd.read_csv(f"{RAW_DATA_DIR}/combined_factors_april10.csv")
     factors = factors.merge(
         nace_group, left_on="description", right_on="name", how="left"
     )[
@@ -224,4 +234,82 @@ if __name__ == "__main__":
         ]
     ]
     factors = factors.loc[:, ~factors.columns.duplicated()]
-    factors.to_csv("./processed_data/factors.csv", index=False)
+    factors.to_csv(f"{PROCESSED_DATA_DIR}/factors.csv", index=False)
+
+    # Industry Now
+    industry_now_file = f"{RAW_DATA_DIR}/IndustryNow_april20.xls"
+    industry_now_drop_cols = [
+        "nace",
+        "description",
+        "level",
+        "code",
+        "code_int",
+        "name",
+        "parent_id",
+    ]
+
+    industry_now_tables = {
+        "industry_now_location": "1_location",
+        "industry_now_schooling": "2_schooling",
+        "industry_now_occupation": "3_occupations",
+        "industry_now_wage": "4_wages_histogram",
+        "industry_now_nearest_industry": "5_nearest_industries",
+    }
+
+    industry_now_data = {}
+
+    for table, sheet in industry_now_tables.items():
+        df = pd.read_excel(industry_now_file, sheet)
+        df.columns = [x.lower() for x in df.columns]
+        df = df.merge(nace_group, left_on="nace", right_on="code_int", how="left").drop(
+            columns=industry_now_drop_cols
+        )
+        industry_now_data[table] = df
+        if table != "industry_now_nearest_industry":
+            df.to_csv(f"{PROCESSED_DATA_DIR}/{table}.csv", index=False)
+
+    industry_now_nearest_industry = industry_now_data["industry_now_nearest_industry"]
+    industry_now_nearest_industry = (
+        pd.wide_to_long(
+            industry_now_nearest_industry,
+            ["nearby_", "description_", "rca_"],
+            i="nace_id",
+            j="place",
+        )
+        .reset_index()
+        .rename(
+            columns={
+                "nearby_": "neighbor_code",
+                "description_": "neighbor_name",
+                "rca_": "neighbor_rca_gte1",
+            }
+        )
+    )
+
+    industry_now_nearest_industry = (
+        industry_now_nearest_industry.merge(
+            nace_group,
+            left_on="neighbor_code",
+            right_on="code_int",
+            how="left",
+            suffixes=("", "_neighbor"),
+        )
+        .drop(
+            columns=["neighbor_code", "neighbor_name", "level", "parent_id", "code_int"]
+        )
+        .rename(
+            columns={
+                "nace_id_neighbor": "neighbor_nace_id",
+                "code": "neighbor_code",
+                "name": "neighbor_name",
+            }
+        )
+    )
+
+    industry_now_nearest_industry.neighbor_rca_gte1 = industry_now_nearest_industry.neighbor_rca_gte1.apply(
+        lambda x: {"No": False, "Yes": True, np.NaN: np.NaN}[x]
+    )
+
+    industry_now_nearest_industry.to_csv(
+        f"{PROCESSED_DATA_DIR}/industry_now_nearest_industry.csv", index=False
+    )

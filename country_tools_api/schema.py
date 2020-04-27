@@ -53,6 +53,41 @@ class Script(SQLAlchemyObjectType):
         interfaces = (graphene.relay.Node,)
 
 
+# Industry Now Location
+class IndustryNowLocation(SQLAlchemyObjectType):
+    class Meta:
+        model = albania.IndustryNowLocation
+        interfaces = (graphene.relay.Node,)
+
+
+# Industry Now Schooling
+class IndustryNowSchooling(SQLAlchemyObjectType):
+    class Meta:
+        model = albania.IndustryNowSchooling
+        interfaces = (graphene.relay.Node,)
+
+
+# Industry Now Occupation
+class IndustryNowOccupation(SQLAlchemyObjectType):
+    class Meta:
+        model = albania.IndustryNowOccupation
+        interfaces = (graphene.relay.Node,)
+
+
+# Industry Now Wage
+class IndustryNowWage(SQLAlchemyObjectType):
+    class Meta:
+        model = albania.IndustryNowWage
+        interfaces = (graphene.relay.Node,)
+
+
+# Industry Now Nearest Industry
+class IndustryNowNearestIndustry(SQLAlchemyObjectType):
+    class Meta:
+        model = albania.IndustryNowNearestIndustry
+        interfaces = (graphene.relay.Node,)
+
+
 def sqlalchemy_filter(args, model, col):
     query = db_session.query(model)
     if col in args:
