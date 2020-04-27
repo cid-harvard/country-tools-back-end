@@ -19,5 +19,6 @@ ssh $WEBSERVER_USER@$WEBSERVER_ADDRESS <<- EOF
     export COUNTRY_TOOLS_DB_NAME=$COUNTRY_TOOLS_DB_NAME
     sudo cp $APP_DIR/api/gunicorn/api.service /etc/systemd/system
     sudo cp $APP_DIR/api/gunicorn/api.ini /etc/systemd/system
-    sudo systemctl reload api
+    sudo systemctl enable api
+    sudo systemctl restart api
 EOF
