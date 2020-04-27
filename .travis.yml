@@ -3,23 +3,19 @@ python:
 - '3.6'
 install: pip install -r requirements.txt
 script:
-- export SERVER_USER=ubuntu
+- export WEBSERVER_USER=ubuntu
 - export APP_DIR=/home/ubuntu
 - openssl aes-256-cbc -K $encrypted_4df03c4dcdbb_key -iv $encrypted_4df03c4dcdbb_iv
   -in deploy_key.enc -out ./deploy_key -d
 - eval "$(ssh-agent -s)"
 - chmod 600 ./deploy_key
-- echo -e "Host $SERVER_ADDRESS\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+- echo -e "Host $WEBSERVER_ADDRESS\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 - ssh-add ./deploy_key
 deploy:
   provider: script
   skip_cleanup: true
-  script: bash ./deploy.sh $PRODUCTION_IP_ADDRESS
+  script: bash ./deploy.sh
   on:
-    branch: master
-deploy:
-  provider: script
-  skip_cleanup: true
-  script: bash ./deploy.sh $STAGING_IP_ADDRESS
-  on:
-    branch: develop
+    branches:
+      - master
+      - develop

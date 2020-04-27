@@ -1,13 +1,11 @@
 #!/bin/bash
 set -xe
 
-SERVER_ADDRESS=$1
-
 # Copy Travis build
-rsync -rq --delete --rsync-path="mkdir -p $APP_DIR/api && rsync" $TRAVIS_BUILD_DIR/country_tools_api/ $SERVER_USER@$SERVER_ADDRESS:$APP_DIR/api
-scp ./requirements.txt $SERVER_USER@$SERVER_ADDRESS:$APP_DIR/
+rsync -rq --delete --rsync-path="mkdir -p $APP_DIR/api && rsync" $TRAVIS_BUILD_DIR/country_tools_api/ $WEBSERVER_USER@$WEBSERVER_ADDRESS:$APP_DIR/api
+scp ./requirements.txt $WEBSERVER_USER@$WEBSERVER_ADDRESS:$APP_DIR/
 
-ssh $SERVER_USER@$SERVER_ADDRESS <<- EOF
+ssh $WEBSERVER_USER@$WEBSERVER_ADDRESS <<- EOF
     sudo apt update
     sudo apt install -y python3.7
     sudo apt install -y python3-venv
