@@ -2,6 +2,10 @@
 raw_data/
 processed_data/
 
+# Database Env Configs
+.prod_db
+.staging_db
+
 # TravisCI deployment key
 deploy_key
 staging_key
