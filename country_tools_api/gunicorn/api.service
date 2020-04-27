@@ -1,0 +1,15 @@
+[Unit]
+Description=Gunicorn instance to serve Country Tools API
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/api
+Environment="PATH=/home/ubuntu/api/env/bin"
+ExecStart=/home/ubuntu/env/bin/gunicorn \
+          --workers 3 --bind unix:api.sock -m 007 \
+          flask_app:app
+
+[Install]
+WantedBy=multi-user.target
