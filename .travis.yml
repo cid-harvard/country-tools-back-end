@@ -1,7 +1,10 @@
 language: python
 python:
 - '3.6'
-install: pip install -r requirements.txt
+branches:
+  only:
+    - master
+    - develop
 script:
 - export WEBSERVER_USER=ubuntu
 - export APP_DIR=/home/ubuntu
@@ -15,7 +18,3 @@ deploy:
   provider: script
   skip_cleanup: true
   script: bash ./deploy.sh
-  on:
-    branches:
-      - master
-      - develop
