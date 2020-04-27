@@ -1,44 +1,45 @@
 import pandas as pd
+from sqlalchemy import MetaData, event
+from sqlalchemy.schema import CreateSchema
 from pandas_to_postgres import DataFrameCopy
-from country_tools_api.database.base import engine
-from sqlalchemy import MetaData
+from country_tools_api.database.base import engine, Base
+from country_tools_api.database.albania import (
+    NACEIndustry,
+    Country,
+    FDIMarkets,
+    FDIMarketsOvertime,
+    Factors,
+    Script,
+)
 
 
-with engine.connect() as c:
-    meta = MetaData(bind=c, reflect=True)
+ALB_PROCESSED_DATA_DIR = "./albania/processed_data"
+ALB_TABLES = [
+    "country",
+    "nace_industry",
+    "fdi_markets",
+    "fdi_markets_overtime",
+    "factors",
+    "script",
+    "industry_now_location",
+    "industry_now_schooling",
+    "industry_now_occupation",
+    "industry_now_wage",
+    "industry_now_nearest_industry",
+]
 
-    DataFrameCopy(
-        pd.read_csv("./albania/processed_data/country.csv"),
-        conn=c,
-        table_obj=meta.tables["country"],
-    ).copy()
 
-    DataFrameCopy(
-        pd.read_csv("./albania/processed_data/nace_industry.csv"),
-        conn=c,
-        table_obj=meta.tables["nace_industry"],
-    ).copy()
+if __name__ == "__main__":
+    # engine.execute("CREATE SCHEMA IF NOT EXISTS albania;")
+    Base.metadata.create_all()
 
-    DataFrameCopy(
-        pd.read_csv("./albania/processed_data/fdi_markets.csv"),
-        conn=c,
-        table_obj=meta.tables["fdi_markets"],
-    ).copy()
+    with engine.connect() as c:
+        meta = MetaData(bind=c, reflect=True)  # , schema="albania")
 
-    DataFrameCopy(
-        pd.read_csv("./albania/processed_data/fdi_markets_overtime.csv"),
-        conn=c,
-        table_obj=meta.tables["fdi_markets_overtime"],
-    ).copy()
-
-    DataFrameCopy(
-        pd.read_csv("./albania/processed_data/factors.csv"),
-        conn=c,
-        table_obj=meta.tables["factors"],
-    ).copy()
-
-    DataFrameCopy(
-        pd.read_csv("./albania/processed_data/albania_script.csv"),
-        conn=c,
-        table_obj=meta.tables["script"],
-    ).copy()
+        for table in ALB_TABLES:
+            DataFrameCopy(
+                pd.read_csv(f"{ALB_PROCESSED_DATA_DIR}/{table}.csv"),
+                conn=c,
+                table_obj=meta.tables[table],
+                # table_obj=meta.tables[f"albania.{table}"],
+            ).copy()
