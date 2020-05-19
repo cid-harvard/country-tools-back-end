@@ -13,10 +13,17 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship, foreign
 
 
+# class Auth(Base):
+
+#     __tablename__ = "auth"
+
+#     key = Column(String, primary_key=True)
+
+
 class Country(Base):
 
     __tablename__ = "country"
-    # __table_args__ = {"schema": "albania"}
+    __table_args__ = {"schema": "albania"}
 
     location_id = Column(Integer, primary_key=True)
     code = Column(String)
@@ -40,8 +47,7 @@ class FDIMarkets(Base):
         PrimaryKeyConstraint(
             "nace_id", "parent_company", "source_city", "source_country"
         ),
-        {}
-        # {"schema": "albania"},
+        {"schema": "albania"},
     )
 
     nace_id = Column(Integer)
@@ -67,8 +73,7 @@ class FDIMarketsOvertime(Base):
     __tablename__ = "fdi_markets_overtime"
     __table_args__ = (
         PrimaryKeyConstraint("nace_id", "destination"),
-        {}
-        # {"schema": "albania"},
+        {"schema": "albania"},
     )
 
     nace_id = Column(Integer)
@@ -84,7 +89,7 @@ class FDIMarketsOvertime(Base):
 class Factors(Base):
 
     __tablename__ = "factors"
-    # __table_args__ = {"schema": "albania"}
+    __table_args__ = {"schema": "albania"}
 
     nace_id = Column(Integer, primary_key=True)
     rca = Column(Enum(*[">= 1", "< 1"], name="rca"))
@@ -101,13 +106,14 @@ class Factors(Base):
     avg_attractiveness = Column(Float)
     v_text = Column(String)
     a_text = Column(String)
+    strategy = Column(String)
     rca_text1 = Column(String)
     rca_text2 = Column(String)
 
 
 class IndustryNowLocation(Base):
     __tablename__ = "industry_now_location"
-    # __table_args__ = {"schema": "albania"}
+    __table_args__ = {"schema": "albania"}
 
     nace_id = Column(Integer, primary_key=True)
     berat = Column(Float)
@@ -126,7 +132,7 @@ class IndustryNowLocation(Base):
 
 class IndustryNowSchooling(Base):
     __tablename__ = "industry_now_schooling"
-    # __table_args__ = {"schema": "albania"}
+    __table_args__ = {"schema": "albania"}
 
     nace_id = Column(Integer, primary_key=True)
     es_below_male = Column(Float)
@@ -143,7 +149,7 @@ class IndustryNowSchooling(Base):
 
 class IndustryNowOccupation(Base):
     __tablename__ = "industry_now_occupation"
-    # __table_args__ = {"schema": "albania"}
+    __table_args__ = {"schema": "albania"}
 
     nace_id = Column(Integer, primary_key=True)
     managers_male = Column(Float)
@@ -170,7 +176,7 @@ class IndustryNowOccupation(Base):
 
 class IndustryNowWage(Base):
     __tablename__ = "industry_now_wage"
-    # __table_args__ = {"schema": "albania"}
+    __table_args__ = {"schema": "albania"}
 
     nace_id = Column(Integer, primary_key=True)
     ind_0_10k = Column(Float)
@@ -189,11 +195,7 @@ class IndustryNowWage(Base):
 
 class IndustryNowNearestIndustry(Base):
     __tablename__ = "industry_now_nearest_industry"
-    __table_args__ = (
-        PrimaryKeyConstraint("nace_id", "place"),
-        {}
-        # {"schema": "albania"}
-    )
+    __table_args__ = (PrimaryKeyConstraint("nace_id", "place"), {"schema": "albania"})
 
     nace_id = Column(Integer)
     place = Column(Integer)
@@ -208,8 +210,7 @@ class Script(Base):
     __tablename__ = "script"
     __table_args__ = (
         PrimaryKeyConstraint("section", "subsection"),
-        {}
-        # {"schema": "albania"},
+        {"schema": "albania"},
     )
 
     section = Column(String)
@@ -220,7 +221,7 @@ class Script(Base):
 class NACEIndustry(Base):
 
     __tablename__ = "nace_industry"
-    # __table_args__ = {"schema": "albania"}
+    __table_args__ = {"schema": "albania"}
 
     nace_id = Column(Integer, primary_key=True)
     level = Column(Enum(*["section", "division", "group"], name="industry_level"))
