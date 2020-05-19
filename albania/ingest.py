@@ -208,7 +208,7 @@ if __name__ == "__main__":
     fdi_time.to_csv(f"{PROCESSED_DATA_DIR}/fdi_markets_overtime.csv", index=False)
 
     # Ingest Viability and Attractiveness Factors
-    factors = pd.read_csv(f"{RAW_DATA_DIR}/combined_factors_april10.csv")
+    factors = pd.read_csv(f"{RAW_DATA_DIR}/combined_factors_may8.csv")
     factors = factors.merge(
         nace_group, left_on="description", right_on="name", how="left"
     )[
@@ -228,6 +228,7 @@ if __name__ == "__main__":
             "avg_attractiveness",
             "v_text",
             "a_text",
+            "strategy",
             "rca",
             "rca_text1",
             "rca_text2",
