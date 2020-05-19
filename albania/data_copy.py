@@ -12,7 +12,7 @@ from country_tools_api.database.albania import (
     Script,
 )
 
-
+ALB_SCHEMA = "albania"
 ALB_PROCESSED_DATA_DIR = "./albania/processed_data"
 ALB_TABLES = [
     "country",
@@ -30,16 +30,15 @@ ALB_TABLES = [
 
 
 if __name__ == "__main__":
-    # engine.execute("CREATE SCHEMA IF NOT EXISTS albania;")
+    engine.execute(f"CREATE SCHEMA IF NOT EXISTS {ALB_SCHEMA};")
     Base.metadata.create_all()
 
     with engine.connect() as c:
-        meta = MetaData(bind=c, reflect=True)  # , schema="albania")
+        meta = MetaData(bind=c, reflect=True, schema=ALB_SCHEMA)
 
         for table in ALB_TABLES:
             DataFrameCopy(
                 pd.read_csv(f"{ALB_PROCESSED_DATA_DIR}/{table}.csv"),
                 conn=c,
-                table_obj=meta.tables[table],
-                # table_obj=meta.tables[f"albania.{table}"],
+                table_obj=meta.tables[f"{ALB_SCHEMA}.{table}"],
             ).copy()
