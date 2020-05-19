@@ -17,6 +17,7 @@ ssh $WEBSERVER_USER@$WEBSERVER_ADDRESS <<- EOF
     export COUNTRY_TOOLS_DB_PASS=$COUNTRY_TOOLS_DB_PASS
     export COUNTRY_TOOLS_DB_HOST=$COUNTRY_TOOLS_DB_HOST
     export COUNTRY_TOOLS_DB_NAME=$COUNTRY_TOOLS_DB_NAME
+    eval "echo \"$(cat .database.tpl)\" > .database"
     sudo cp $APP_DIR/api/gunicorn/api.service /etc/systemd/system
     sudo cp $APP_DIR/api/gunicorn/api.ini /etc/systemd/system
     sudo systemctl enable api

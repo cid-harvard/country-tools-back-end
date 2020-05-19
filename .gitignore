@@ -6,6 +6,7 @@ processed_data/
 .prod_db
 .staging_db
 .local_db
+.database
 
 # TravisCI deployment key
 deploy_key
