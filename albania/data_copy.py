@@ -4,12 +4,12 @@ from sqlalchemy.schema import CreateSchema
 from pandas_to_postgres import DataFrameCopy
 from country_tools_api.database.base import engine, Base
 from country_tools_api.database.albania import (
-    NACEIndustry,
-    Country,
-    FDIMarkets,
-    FDIMarketsOvertime,
-    Factors,
-    Script,
+    AlbaniaNACEIndustry,
+    AlbaniaCountry,
+    AlbaniaFDIMarkets,
+    AlbaniaFDIMarketsOvertime,
+    AlbaniaFactors,
+    AlbaniaScript,
 )
 
 ALB_SCHEMA = "albania"

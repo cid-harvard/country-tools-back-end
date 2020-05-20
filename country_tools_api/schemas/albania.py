@@ -9,30 +9,30 @@ from .util import sqlalchemy_filter
 
 
 # NACE Industry
-class NACEIndustry(SQLAlchemyObjectType):
+class AlbaniaNACEIndustry(SQLAlchemyObjectType):
     class Meta:
-        model = albania_db.NACEIndustry
+        model = albania_db.AlbaniaNACEIndustry
         interfaces = (graphene.relay.Node,)
 
 
 # Country
-class Country(SQLAlchemyObjectType):
+class AlbaniaCountry(SQLAlchemyObjectType):
     class Meta:
-        model = albania_db.Country
+        model = albania_db.AlbaniaCountry
         interfaces = (graphene.relay.Node,)
 
 
 # FDI Markets
-class FDIMarkets(SQLAlchemyObjectType):
+class AlbaniaFDIMarkets(SQLAlchemyObjectType):
     class Meta:
-        model = albania_db.FDIMarkets
+        model = albania_db.AlbaniaFDIMarkets
         interfaces = (graphene.relay.Node,)
 
 
 # FDI Markets Overtime
-class FDIMarketsOvertime(SQLAlchemyObjectType):
+class AlbaniaFDIMarketsOvertime(SQLAlchemyObjectType):
     class Meta:
-        model = albania_db.FDIMarketsOvertime
+        model = albania_db.AlbaniaFDIMarketsOvertime
         interfaces = (graphene.relay.Node,)
 
     # Graphene can't handle enum options starting with non-alpha characters
@@ -40,9 +40,9 @@ class FDIMarketsOvertime(SQLAlchemyObjectType):
 
 
 # Viability
-class Factors(SQLAlchemyObjectType):
+class AlbaniaFactors(SQLAlchemyObjectType):
     class Meta:
-        model = albania_db.Factors
+        model = albania_db.AlbaniaFactors
         interfaces = (graphene.relay.Node,)
 
     # Graphene can't handle enum options starting with non-alpha characters
@@ -50,44 +50,44 @@ class Factors(SQLAlchemyObjectType):
 
 
 # Script
-class Script(SQLAlchemyObjectType):
+class AlbaniaScript(SQLAlchemyObjectType):
     class Meta:
-        model = albania_db.Script
+        model = albania_db.AlbaniaScript
         interfaces = (graphene.relay.Node,)
 
 
 # Industry Now Location
-class IndustryNowLocation(SQLAlchemyObjectType):
+class AlbaniaIndustryNowLocation(SQLAlchemyObjectType):
     class Meta:
-        model = albania_db.IndustryNowLocation
+        model = albania_db.AlbaniaIndustryNowLocation
         interfaces = (graphene.relay.Node,)
 
 
 # Industry Now Schooling
-class IndustryNowSchooling(SQLAlchemyObjectType):
+class AlbaniaIndustryNowSchooling(SQLAlchemyObjectType):
     class Meta:
-        model = albania_db.IndustryNowSchooling
+        model = albania_db.AlbaniaIndustryNowSchooling
         interfaces = (graphene.relay.Node,)
 
 
 # Industry Now Occupation
-class IndustryNowOccupation(SQLAlchemyObjectType):
+class AlbaniaIndustryNowOccupation(SQLAlchemyObjectType):
     class Meta:
-        model = albania_db.IndustryNowOccupation
+        model = albania_db.AlbaniaIndustryNowOccupation
         interfaces = (graphene.relay.Node,)
 
 
 # Industry Now Wage
-class IndustryNowWage(SQLAlchemyObjectType):
+class AlbaniaIndustryNowWage(SQLAlchemyObjectType):
     class Meta:
-        model = albania_db.IndustryNowWage
+        model = albania_db.AlbaniaIndustryNowWage
         interfaces = (graphene.relay.Node,)
 
 
 # Industry Now Nearest Industry
-class IndustryNowNearestIndustry(SQLAlchemyObjectType):
+class AlbaniaIndustryNowNearestIndustry(SQLAlchemyObjectType):
     class Meta:
-        model = albania_db.IndustryNowNearestIndustry
+        model = albania_db.AlbaniaIndustryNowNearestIndustry
         interfaces = (graphene.relay.Node,)
 
 
@@ -95,59 +95,67 @@ class AlbaniaQuery(graphene.ObjectType):
     """Albania query objects for GraphQL API."""
 
     # New endpoints
-    albania_nace_industry_list = graphene.List(NACEIndustry)
+    albania_nace_industry_list = graphene.List(AlbaniaNACEIndustry)
     albania_nace_industry = graphene.Field(
-        NACEIndustry, nace_id=graphene.Int(required=True)
+        AlbaniaNACEIndustry, nace_id=graphene.Int(required=True)
     )
 
     # Old endpoints
-    nace_industry_list = graphene.List(NACEIndustry)
-    nace_industry = graphene.Field(NACEIndustry, nace_id=graphene.Int(required=True))
-    country = graphene.List(Country, location_id=graphene.Int())
-    fdi_markets = graphene.List(FDIMarkets, nace_id=graphene.Int())
-    protected_fdi_markets = graphene.List(
-        FDIMarkets, nace_id=graphene.Int(), key=graphene.String(required=True)
+    nace_industry_list = graphene.List(AlbaniaNACEIndustry)
+    nace_industry = graphene.Field(
+        AlbaniaNACEIndustry, nace_id=graphene.Int(required=True)
     )
-    fdi_markets_overtime = graphene.List(FDIMarketsOvertime, nace_id=graphene.Int())
-    factors = graphene.List(Factors, nace_id=graphene.Int())
-    script = graphene.List(Script)
+    country = graphene.List(AlbaniaCountry, location_id=graphene.Int())
+    fdi_markets = graphene.List(AlbaniaFDIMarkets, nace_id=graphene.Int())
+    protected_fdi_markets = graphene.List(
+        AlbaniaFDIMarkets, nace_id=graphene.Int(), key=graphene.String(required=True)
+    )
+    fdi_markets_overtime = graphene.List(
+        AlbaniaFDIMarketsOvertime, nace_id=graphene.Int()
+    )
+    factors = graphene.List(AlbaniaFactors, nace_id=graphene.Int())
+    script = graphene.List(AlbaniaScript)
 
     def resolve_albania_nace_industry_list(self, info, **args):
-        return db_session.query(albania_db.NACEIndustry)
+        return db_session.query(albania_db.AlbaniaNACEIndustry)
 
     def resolve_albania_nace_industry(self, info, **args):
         return (
-            db_session.query(albania_db.NACEIndustry)
-            .filter(getattr(albania_db.NACEIndustry, "nace_id") == args["nace_id"])
+            db_session.query(albania_db.AlbaniaNACEIndustry)
+            .filter(
+                getattr(albania_db.AlbaniaNACEIndustry, "nace_id") == args["nace_id"]
+            )
             .one()
         )
 
     def resolve_nace_industry_list(self, info, **args):
-        return db_session.query(albania_db.NACEIndustry)
+        return db_session.query(albania_db.AlbaniaNACEIndustry)
 
     def resolve_nace_industry(self, info, **args):
         return (
-            db_session.query(albania_db.NACEIndustry)
-            .filter(getattr(albania_db.NACEIndustry, "nace_id") == args["nace_id"])
+            db_session.query(albania_db.AlbaniaNACEIndustry)
+            .filter(
+                getattr(albania_db.AlbaniaNACEIndustry, "nace_id") == args["nace_id"]
+            )
             .one()
         )
 
     def resolve_country(self, info, **args):
-        return sqlalchemy_filter(args, albania_db.Country, "location_id")
+        return sqlalchemy_filter(args, albania_db.AlbaniaCountry, "location_id")
 
     def resolve_fdi_markets(self, info, **args):
-        return sqlalchemy_filter(args, albania_db.FDIMarkets, "nace_id")
+        return sqlalchemy_filter(args, albania_db.AlbaniaFDIMarkets, "nace_id")
 
     def resolve_protected_fdi_markets(self, info, **args):
         if args["key"] != "albania2020":
             return None
-        return sqlalchemy_filter(args, albania_db.FDIMarkets, "nace_id")
+        return sqlalchemy_filter(args, albania_db.AlbaniaFDIMarkets, "nace_id")
 
     def resolve_fdi_markets_overtime(self, info, **args):
-        return sqlalchemy_filter(args, albania_db.FDIMarketsOvertime, "nace_id")
+        return sqlalchemy_filter(args, albania_db.AlbaniaFDIMarketsOvertime, "nace_id")
 
     def resolve_factors(self, info, **args):
-        return sqlalchemy_filter(args, albania_db.Factors, "nace_id")
+        return sqlalchemy_filter(args, albania_db.AlbaniaFactors, "nace_id")
 
     def resolve_script(self, info, **args):
-        return db_session.query(albania_db.Script)
+        return db_session.query(albania_db.AlbaniaScript)

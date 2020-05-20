@@ -13,14 +13,14 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship, foreign
 
 
-# class Auth(Base):
+# class AlbaniaAuth(Base):
 
 #     __tablename__ = "auth"
 
 #     key = Column(String, primary_key=True)
 
 
-class Country(Base):
+class AlbaniaCountry(Base):
 
     __tablename__ = "country"
     __table_args__ = {"schema": "albania"}
@@ -40,7 +40,7 @@ class Country(Base):
     former_country = Column(Boolean(create_constraint=False), nullable=True)
 
 
-class FDIMarkets(Base):
+class AlbaniaFDIMarkets(Base):
 
     __tablename__ = "fdi_markets"
     __table_args__ = (
@@ -64,11 +64,12 @@ class FDIMarkets(Base):
     avg_capex = Column(Float)
     avg_jobs = Column(Float)
     country = relationship(
-        "Country", primaryjoin=(location_id == foreign(Country.location_id))
+        "AlbaniaCountry",
+        primaryjoin=(location_id == foreign(AlbaniaCountry.location_id)),
     )
 
 
-class FDIMarketsOvertime(Base):
+class AlbaniaFDIMarketsOvertime(Base):
 
     __tablename__ = "fdi_markets_overtime"
     __table_args__ = (
@@ -86,7 +87,7 @@ class FDIMarketsOvertime(Base):
     projects_15_18 = Column(Integer)
 
 
-class Factors(Base):
+class AlbaniaFactors(Base):
 
     __tablename__ = "factors"
     __table_args__ = {"schema": "albania"}
@@ -111,7 +112,7 @@ class Factors(Base):
     rca_text2 = Column(String)
 
 
-class IndustryNowLocation(Base):
+class AlbaniaIndustryNowLocation(Base):
     __tablename__ = "industry_now_location"
     __table_args__ = {"schema": "albania"}
 
@@ -130,7 +131,7 @@ class IndustryNowLocation(Base):
     vlore = Column(Float)
 
 
-class IndustryNowSchooling(Base):
+class AlbaniaIndustryNowSchooling(Base):
     __tablename__ = "industry_now_schooling"
     __table_args__ = {"schema": "albania"}
 
@@ -147,7 +148,7 @@ class IndustryNowSchooling(Base):
     university_higher_female = Column(Float)
 
 
-class IndustryNowOccupation(Base):
+class AlbaniaIndustryNowOccupation(Base):
     __tablename__ = "industry_now_occupation"
     __table_args__ = {"schema": "albania"}
 
@@ -174,7 +175,7 @@ class IndustryNowOccupation(Base):
     other_female = Column(Float)
 
 
-class IndustryNowWage(Base):
+class AlbaniaIndustryNowWage(Base):
     __tablename__ = "industry_now_wage"
     __table_args__ = {"schema": "albania"}
 
@@ -193,7 +194,7 @@ class IndustryNowWage(Base):
     national_100k_up = Column(Float)
 
 
-class IndustryNowNearestIndustry(Base):
+class AlbaniaIndustryNowNearestIndustry(Base):
     __tablename__ = "industry_now_nearest_industry"
     __table_args__ = (PrimaryKeyConstraint("nace_id", "place"), {"schema": "albania"})
 
@@ -205,7 +206,7 @@ class IndustryNowNearestIndustry(Base):
     neighbor_rca_gte1 = Column(Boolean)
 
 
-class Script(Base):
+class AlbaniaScript(Base):
 
     __tablename__ = "script"
     __table_args__ = (
@@ -218,7 +219,7 @@ class Script(Base):
     text = Column(String)
 
 
-class NACEIndustry(Base):
+class AlbaniaNACEIndustry(Base):
 
     __tablename__ = "nace_industry"
     __table_args__ = {"schema": "albania"}
@@ -229,29 +230,32 @@ class NACEIndustry(Base):
     name = Column(String)
     parent_id = Column(Integer)
     fdi_markets = relationship(
-        "FDIMarkets", primaryjoin=(nace_id == foreign(FDIMarkets.nace_id))
+        "AlbaniaFDIMarkets", primaryjoin=(nace_id == foreign(AlbaniaFDIMarkets.nace_id))
     )
     fdi_markets_overtime = relationship(
-        "FDIMarketsOvertime",
-        primaryjoin=(nace_id == foreign(FDIMarketsOvertime.nace_id)),
+        "AlbaniaFDIMarketsOvertime",
+        primaryjoin=(nace_id == foreign(AlbaniaFDIMarketsOvertime.nace_id)),
     )
-    factors = relationship("Factors", primaryjoin=(nace_id == foreign(Factors.nace_id)))
+    factors = relationship(
+        "AlbaniaFactors", primaryjoin=(nace_id == foreign(AlbaniaFactors.nace_id))
+    )
     industry_now_location = relationship(
-        "IndustryNowLocation",
-        primaryjoin=(nace_id == foreign(IndustryNowLocation.nace_id)),
+        "AlbaniaIndustryNowLocation",
+        primaryjoin=(nace_id == foreign(AlbaniaIndustryNowLocation.nace_id)),
     )
     industry_now_schooling = relationship(
-        "IndustryNowSchooling",
-        primaryjoin=(nace_id == foreign(IndustryNowSchooling.nace_id)),
+        "AlbaniaIndustryNowSchooling",
+        primaryjoin=(nace_id == foreign(AlbaniaIndustryNowSchooling.nace_id)),
     )
     industry_now_occupation = relationship(
-        "IndustryNowOccupation",
-        primaryjoin=(nace_id == foreign(IndustryNowOccupation.nace_id)),
+        "AlbaniaIndustryNowOccupation",
+        primaryjoin=(nace_id == foreign(AlbaniaIndustryNowOccupation.nace_id)),
     )
     industry_now_wage = relationship(
-        "IndustryNowWage", primaryjoin=(nace_id == foreign(IndustryNowWage.nace_id))
+        "AlbaniaIndustryNowWage",
+        primaryjoin=(nace_id == foreign(AlbaniaIndustryNowWage.nace_id)),
     )
     industry_now_nearest_industry = relationship(
-        "IndustryNowNearestIndustry",
-        primaryjoin=(nace_id == foreign(IndustryNowNearestIndustry.nace_id)),
+        "AlbaniaIndustryNowNearestIndustry",
+        primaryjoin=(nace_id == foreign(AlbaniaIndustryNowNearestIndustry.nace_id)),
     )
