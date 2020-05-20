@@ -29,6 +29,23 @@ class JordanNationality(Base):
     medianwage = Column(String)
 
 
+class JordanOverTime(Base):
+    __tablename__ = "control"
+    __table_args__ = (
+        PrimaryKeyConstraint("industry_code", "visualization", "variable"),
+        {"schema": "jordan"},
+    )
+
+    industry_code = Column(Integer)
+    visualization = Column(String)
+    variable = Column(String)
+    years_2004_2006 = Column(Float)
+    years_2007_2009 = Column(Float)
+    years_2010_2012 = Column(Float)
+    years_2013_2015 = Column(Float)
+    years_2016_2018 = Column(Float)
+
+
 class JordanControl(Base):
 
     __tablename__ = "control"
@@ -210,6 +227,10 @@ class JordanIndustry(Base):
     occupation = relationship(
         "JordanOccupation",
         primaryjoin=(industry_code == foreign(JordanOccupation.industry_code)),
+    )
+    over_time = relationship(
+        "JordanOverTime",
+        primaryjoin=(industry_code == foreign(JordanOverTime.industry_code)),
     )
     region_top_fdi = relationship(
         "JordanRegionTopFDI",

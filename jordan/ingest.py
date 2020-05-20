@@ -155,13 +155,31 @@ if __name__ == "__main__":
         df = (
             pd.read_csv(f"{RAW_DATA_DIR}/{sheet}.csv")
             .drop(
-                columns=["sic4_description", "IndustrySector", "SubSector"],
+                columns=[
+                    "sic4_description",
+                    "IndustrySector",
+                    "SubSector",
+                    "industrysector",
+                    "subsector",
+                ],
                 errors="ignore",
             )
-            .rename(columns={"industry": "industry_code", "Variable": "variable"})
+            .rename(
+                columns={
+                    "industry": "industry_code",
+                    "Variable": "variable",
+                    "2004-2006": "years_2004_2006",
+                    "2007-2009": "years_2007_2009",
+                    "2010-2012": "years_2010_2012",
+                    "2013-2015": "years_2013_2015",
+                    "2016-2018": "years_2016_2018",
+                }
+            )
         )
         df["visualization"] = viz_title
         over_time = over_time.append(df)
+
+    over_time.to_csv(f"{PROCESSED_DATA_DIR}/over_time.csv", index=False)
 
     ### COPY OTHER SHEETS --------------------------------------------------------------
     copy_sheets = {

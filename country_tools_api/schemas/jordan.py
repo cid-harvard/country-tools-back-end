@@ -74,6 +74,12 @@ class JordanFactors(SQLAlchemyObjectType):
         interfaces = (graphene.relay.Node,)
 
 
+class JordanOverTime(SQLAlchemyObjectType):
+    class Meta:
+        model = jordan_db.JordanOverTime
+        interfaces = (graphene.relay.Node,)
+
+
 class JordanQuery(graphene.ObjectType):
     """Jordan query objects for GraphQL API."""
 
