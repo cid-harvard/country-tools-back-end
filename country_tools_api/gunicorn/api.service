@@ -6,7 +6,7 @@ After=network.target
 User=ubuntu
 Group=www-data
 WorkingDirectory=/home/ubuntu/api
-EnvironmentFile=/home/ubuntu/.database
+EnvironmentFile=/home/ubuntu/api/.database
 Environment="PATH=/home/ubuntu/api/env/bin"
 ExecStart=/home/ubuntu/env/bin/gunicorn \
           --workers 3 --bind unix:api.sock -m 007 \
