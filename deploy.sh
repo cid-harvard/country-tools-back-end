@@ -2,7 +2,7 @@
 set -xe
 
 # Generate file with database config
-eval "echo \"$(cat $TRAVIS_BUILD_DIR/country_tools_api/database.tpl)\" > $TRAVIS_BUILD_DIR/country_tools_api/database"
+eval "echo \"$(cat $TRAVIS_BUILD_DIR/country_tools_api/database.tpl)\" > $TRAVIS_BUILD_DIR/country_tools_api/.database"
 
 # Copy Travis build
 rsync -rq --delete --rsync-path="mkdir -p $APP_DIR/api && rsync" $TRAVIS_BUILD_DIR/country_tools_api/ $WEBSERVER_USER@$WEBSERVER_ADDRESS:$APP_DIR/api
