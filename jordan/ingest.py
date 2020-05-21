@@ -24,7 +24,7 @@ if __name__ == "__main__":
     nationality = pd.DataFrame(
         product(
             list(industry.industry_code),
-            ["Jordanian", "Egyptian", "Syrian", "Other Arab", "Non Arab"],
+            ["Jordanian", "Egyptian", "Syrian", "Other Arab", "Non Arab", "Total"],
         ),
         columns=("industry_code", "nationality"),
     )
