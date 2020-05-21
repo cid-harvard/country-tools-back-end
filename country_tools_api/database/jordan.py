@@ -30,7 +30,8 @@ class JordanNationality(Base):
 
 
 class JordanOverTime(Base):
-    __tablename__ = "control"
+
+    __tablename__ = "over_time"
     __table_args__ = (
         PrimaryKeyConstraint("industry_code", "visualization", "variable"),
         {"schema": "jordan"},

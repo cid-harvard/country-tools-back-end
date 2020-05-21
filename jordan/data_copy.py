@@ -28,6 +28,7 @@ JOR_TABLES = [
     "map_location",
     "nationality",
     "occupation",
+    "over_time",
     "region_top_fdi",
     "schooling",
     "text",
