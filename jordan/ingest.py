@@ -177,6 +177,8 @@ if __name__ == "__main__":
             )
         )
         df["visualization"] = viz_title
+        if viz_title == "fdi_bar_chart":
+            df["variable"] = "fdi_bar_chart"
         over_time = over_time.append(df)
 
     over_time.to_csv(f"{PROCESSED_DATA_DIR}/over_time.csv", index=False)
