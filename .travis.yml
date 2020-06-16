@@ -1,23 +1,20 @@
 language: python
 python:
-  - "3.6"
-install: "pip install -r requirements.txt"
-script: "python ./country_tools_api/flask_app.py"
-before_install:
-  - export SERVER_USER=ubuntu
-  - export APP_DIR=/home/ubuntu
-  - if [ $TRAVIS_BRANCH == "develop" ]; then
-      export SERVER_ADDRESS=$STAGING_IP_ADDRESS;
-      export ENCRYPTED_DEPLOY_KEY=./deploy_keys/staging_key.enc;
-    fi
-  - if [ $TRAVIS_BRANCH == "master" ]; then
-      export SERVER_ADDRESS=$PRODUCTION_IP_ADDRESS;
-      export ENCRYPTED_DEPLOY_KEY=./deploy_keys/prod_key.enc;
-    fi
-  # Decrypt deploy key and add to SSH keys
-  - openssl aes-256-cbc -K $encrypted_86693ad9be83_key -iv $encrypted_86693ad9be83_iv
-      -in $ENCRYPTED_DEPLOY_KEY -out deploy_key -d
-  - eval "$(ssh-agent -s)"
-  - chmod 600 ./deploy_key
-  - echo -e "Host $SERVER_ADDRESS\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-  - ssh-add ./deploy_key
+- '3.6'
+
+script:
+- export WEBSERVER_USER=ubuntu
+- export APP_DIR=/home/ubuntu
+- openssl aes-256-cbc -K $encrypted_4df03c4dcdbb_key -iv $encrypted_4df03c4dcdbb_iv
+  -in deploy_key.enc -out ./deploy_key -d
+- eval "$(ssh-agent -s)"
+- chmod 600 ./deploy_key
+- echo -e "Host $WEBSERVER_ADDRESS\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+- ssh-add ./deploy_key
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: bash ./deploy.sh
+  on:
+    all_branches: true
+    condition: $TRAVIS_BRANCH =~ ^(develop|master)$

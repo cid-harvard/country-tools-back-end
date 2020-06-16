@@ -2,6 +2,12 @@
 raw_data/
 processed_data/
 
+# Database Env Configs
+.prod_db
+.staging_db
+.local_db
+.database
+
 # TravisCI deployment key
 deploy_key
 staging_key
@@ -136,3 +142,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
