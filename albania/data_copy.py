@@ -1,3 +1,4 @@
+import sys
 import pandas as pd
 from sqlalchemy import MetaData, event
 from sqlalchemy.schema import CreateSchema
@@ -30,13 +31,19 @@ ALB_TABLES = [
 
 
 if __name__ == "__main__":
+    table_args = sys.argv[1:]
+    if table_args != []:
+        tables = table_args
+    else:
+        tables = ALB_TABLES
+
     engine.execute(f"CREATE SCHEMA IF NOT EXISTS {ALB_SCHEMA};")
     Base.metadata.create_all()
 
     with engine.connect() as c:
         meta = MetaData(bind=c, reflect=True, schema=ALB_SCHEMA)
 
-        for table in ALB_TABLES:
+        for table in tables:
             DataFrameCopy(
                 pd.read_csv(f"{ALB_PROCESSED_DATA_DIR}/{table}.csv"),
                 conn=c,
