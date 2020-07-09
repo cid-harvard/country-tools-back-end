@@ -15,6 +15,9 @@ class HubProjects(SQLAlchemyObjectType):
         model = hub_db.HubProjects
         interfaces = (graphene.relay.Node,)
 
+    data = graphene.List(graphene.String)
+    keywords = graphene.List(graphene.String)
+
 
 class HubKeywords(graphene.ObjectType):
     keyword = graphene.String()
