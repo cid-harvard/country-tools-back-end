@@ -1,5 +1,5 @@
 from .base import Base
-from sqlalchemy import Column, Integer, String, Boolean, Enum, ARRAY
+from sqlalchemy import Column, Integer, String, Boolean, Enum, ARRAY, UniqueConstraint
 
 project_categories = Enum(
     *[
@@ -19,10 +19,14 @@ project_statuses = Enum(*["active", "archived", "complete"], name="project_statu
 class HubProjects(Base):
 
     __tablename__ = "projects"
-    __table_args__ = {"schema": "hub"}
+    __table_args__ = (
+        UniqueConstraint("ordering", name="uix_ordering"),
+        {"schema": "hub"},
+    )
 
     project_name = Column(String, primary_key=True)
     link = Column(String)
+    local_file = Column(Boolean)
     project_category = Column(project_categories)
     show = Column(Boolean)
     data = Column(ARRAY(String))
@@ -30,5 +34,7 @@ class HubProjects(Base):
     card_size = Column(card_sizes)
     announcement = Column(String)
     ordering = Column(Integer)
-    card_image = Column(String)
     status = Column(project_statuses)
+    card_image_hi = Column(String)
+    card_image_lo = Column(String)
+

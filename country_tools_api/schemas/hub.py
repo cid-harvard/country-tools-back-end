@@ -7,8 +7,6 @@ from collections import Counter
 from database.base import db_session
 from database import hub as hub_db
 
-from .util import sqlalchemy_filter
-
 
 class HubProjects(SQLAlchemyObjectType):
     class Meta:
@@ -46,14 +44,11 @@ class HubQuery(graphene.ObjectType):
     def resolve_hub_keywords_list(self, info, **args):
         keywords = []
 
-        c = Counter(
-            [
-                x[0]
-                for x in (
-                    db_session.query(func.unnest(hub_db.HubProjects.keywords)).all()
-                )
-            ]
+        q = db_session.query(hub_db.HubProjects).filter(
+            getattr(hub_db.HubProjects, "show").is_(True)
         )
+
+        c = Counter([key for data in q for key in data.keywords])
 
         for key, count in c.items():
             keywords.append(HubKeywords(key, count))
