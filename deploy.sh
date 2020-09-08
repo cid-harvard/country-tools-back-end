@@ -18,6 +18,7 @@ ssh $WEBSERVER_USER@$WEBSERVER_ADDRESS <<- EOF
     pip install -r requirements.txt
     sudo cp $APP_DIR/api/gunicorn/api.service /etc/systemd/system
     sudo cp $APP_DIR/api/gunicorn/api.ini /etc/systemd/system
+    . $APP_DIR/api/.database
     sudo systemctl enable api
     sudo systemctl restart api
 EOF
