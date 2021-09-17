@@ -36,18 +36,34 @@ class NamibiaNAICSFactors(SQLAlchemyObjectType):
 
 
 class NamibiaQuery(graphene.ObjectType):
-    namibia_hs_list = graphene.List(NamibiaHSClassification)
+    namibia_hs_list = graphene.List(
+        NamibiaHSClassification,
+        in_tool=graphene.Boolean(default_value=True),
+        complexity_report=graphene.Boolean(),
+    )
     namibia_hs = graphene.Field(
         NamibiaHSClassification, hs_id=graphene.Int(required=True)
     )
 
-    namibia_naics_list = graphene.List(NamibiaNAICSClassification)
+    namibia_naics_list = graphene.List(
+        NamibiaNAICSClassification,
+        in_tool=graphene.Boolean(default_value=True),
+        complexity_report=graphene.Boolean(),
+    )
     namibia_naics = graphene.Field(
         NamibiaNAICSClassification, naics_id=graphene.Int(required=True)
     )
 
     def resolve_namibia_hs_list(self, info, **args):
-        return db_session.query(namibia_db.NamibiaHSClassification)
+        q = db_session.query(namibia_db.NamibiaHSClassification)
+
+        for flag in ("in_tool", "complexity_report"):
+            if args.get(flag):
+                q = q.filter(
+                    getattr(namibia_db.NamibiaHSClassification, flag) == args[flag]
+                )
+
+        return q
 
     def resolve_namibia_hs(self, info, **args):
         return (
@@ -59,7 +75,15 @@ class NamibiaQuery(graphene.ObjectType):
         )
 
     def resolve_namibia_naics_list(self, info, **args):
-        return db_session.query(namibia_db.NamibiaNAICSClassification)
+        q = db_session.query(namibia_db.NamibiaNAICSClassification)
+
+        for flag in ("in_tool", "complexity_report"):
+            if args.get(flag):
+                q = q.filter(
+                    getattr(namibia_db.NamibiaNAICSClassification, flag) == args[flag]
+                )
+
+        return q
 
     def resolve_namibia_naics(self, info, **args):
         return (
