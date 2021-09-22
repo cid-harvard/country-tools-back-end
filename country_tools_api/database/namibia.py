@@ -10,7 +10,7 @@ from sqlalchemy import (
     PrimaryKeyConstraint,
     ForeignKeyConstraint,
 )
-from sqlalchemy.orm import relationship, foreign
+from sqlalchemy.orm import relation, relationship, foreign
 
 
 class NamibiaHSFactors(Base):
@@ -30,6 +30,10 @@ class NamibiaHSFactors(Base):
     f_input_availability = Column(Float)
     attractiveness = Column(Float)
     feasibility = Column(Float)
+    share_female = Column(Float)
+    share_youth = Column(Float)
+    share_lskill = Column(Float)
+    pct_occupations_present = Column(Float)
 
 
 class NamibiaNAICSFactors(Base):
@@ -49,6 +53,62 @@ class NamibiaNAICSFactors(Base):
     f_input_availability = Column(Float)
     attractiveness = Column(Float)
     feasibility = Column(Float)
+    share_female = Column(Float)
+    share_youth = Column(Float)
+    share_lskill = Column(Float)
+    pct_occupations_present = Column(Float)
+
+
+class NamibiaHSRelativeDemand(Base):
+    __tablename__ = "hs_relative_demand"
+    __table_args__ = (
+        PrimaryKeyConstraint("hs_id", "location_code"),
+        {"schema": "namibia"},
+    )
+
+    hs_id = Column(Integer)
+    location_code = Column(String)
+    country_demand_avg = Column(Float)
+    country_demand_pc_avg = Column(Float)
+
+
+class NamibiaNAICSRelativeDemand(Base):
+    __tablename__ = "naics_relative_demand"
+    __table_args__ = (
+        PrimaryKeyConstraint("naics_id", "location_code"),
+        {"schema": "namibia"},
+    )
+
+    naics_id = Column(Integer)
+    location_code = Column(String)
+    country_demand_avg = Column(Float)
+    country_demand_pc_avg = Column(Float)
+
+
+class NamibiaHSProximity(Base):
+    __tablename__ = "hs_proximity"
+    __table_args__ = (
+        PrimaryKeyConstraint("hs_id", "partner_id"),
+        {"schema": "namibia"},
+    )
+
+    hs_id = Column(Integer)
+    partner_id = Column(Integer)
+    proximity = Column(Float)
+    rank = Column(Integer)
+
+
+class NamibiaNAICSProximity(Base):
+    __tablename__ = "naics_proximity"
+    __table_args__ = (
+        PrimaryKeyConstraint("naics_id", "partner_id"),
+        {"schema": "namibia"},
+    )
+
+    naics_id = Column(Integer)
+    partner_id = Column(Integer)
+    proximity = Column(Float)
+    rank = Column(Integer)
 
 
 class NamibiaHSClassification(Base):
@@ -65,6 +125,13 @@ class NamibiaHSClassification(Base):
 
     factors = relationship(
         "NamibiaHSFactors", primaryjoin=(hs_id == foreign(NamibiaHSFactors.hs_id))
+    )
+    relative_demand = relationship(
+        "NamibiaHSRelativeDemand",
+        primaryjoin=(hs_id == foreign(NamibiaHSRelativeDemand.hs_id)),
+    )
+    proximity = relationship(
+        "NamibiaHSProximity", primaryjoin=(hs_id == foreign(NamibiaHSProximity.hs_id))
     )
 
 
@@ -83,4 +150,12 @@ class NamibiaNAICSClassification(Base):
     factors = relationship(
         "NamibiaNAICSFactors",
         primaryjoin=(naics_id == foreign(NamibiaNAICSFactors.naics_id)),
+    )
+    relative_demand = relationship(
+        "NamibiaNAICSRelativeDemand",
+        primaryjoin=(naics_id == foreign(NamibiaNAICSRelativeDemand.naics_id)),
+    )
+    proximity = relationship(
+        "NamibiaNAICSProximity",
+        primaryjoin=(naics_id == foreign(NamibiaNAICSProximity.naics_id)),
     )

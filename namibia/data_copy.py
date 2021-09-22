@@ -18,6 +18,10 @@ NAM_TABLES = [
     "naics_classification",
     "hs_factors",
     "naics_factors",
+    "hs_relative_demand",
+    # "naics_relative_demand",
+    "hs_proximity",
+    "naics_proximity",
 ]
 
 

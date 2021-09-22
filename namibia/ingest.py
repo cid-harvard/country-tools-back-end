@@ -1,5 +1,7 @@
-import pandas as pd
+import json
 from os import path
+import pandas as pd
+import numpy as np
 
 RAW_DATA_DIR = "./raw_data"
 PROCESSED_DATA_DIR = "./processed_data"
@@ -37,7 +39,7 @@ if __name__ == "__main__":
     ## HS 4-digit Classification -------------------------------------------------------
     hs_classification = pd.read_csv(
         path.join(RAW_DATA_DIR, "hs_classification.csv")
-    ).rename(columns={"id": "hs_id", "name_en": "name"})
+    ).rename(columns={"id": "hs_id", "name_short_en": "name"})
     hs_classification = hs_classification[hs_classification.level == "4digit"]
     hs_classification = hs_classification[
         ["hs_id", "name", "code", "level", "parent_id"]
@@ -90,6 +92,123 @@ if __name__ == "__main__":
     naics_df["attractiveness"] = naics_df[ATTRACTIVENESS_COLS].mean(axis=1)
     naics_df["feasibility"] = naics_df[FEASIBILITY_COLS].mean(axis=1)
 
+    # Merge Industry Now product-level factors -----------------------------------------
+    ## HS 4-digit ----------------------------------------------------------------------
+
+    ## NAICS 6-digit -------------------------------------------------------------------
+    naics_eg = (
+        pd.read_csv(
+            path.join(RAW_DATA_DIR, "factor_data_naics-employment_groups.csv"),
+            dtype={"naics": str},
+        )
+        .merge(
+            naics_classification[["code", "naics_id"]], left_on="naics", right_on="code"
+        )
+        .drop(columns=["code", "naics"])
+    )
+
+    naics_df = naics_df.merge(naics_eg, on="naics_id", how="left")
+
+    # Format country relative demand per product/industry ---------------------------------------
+    ## HS 4-digit ----------------------------------------------------------------------
+    hs_relative_demand = (
+        pd.read_csv(
+            path.join(RAW_DATA_DIR, "factor_data_hs4-relative_demand.csv"),
+            dtype={"hs4": str},
+        )
+        .merge(hs_classification[["code", "hs_id"]], left_on="hs4", right_on="code")
+        .drop(columns=["code", "hs4"])
+    )
+
+    ## NAICS 6-digit -------------------------------------------------------------------
+
+    # Format occupational data ---------------------------------------------------------
+    ## HS 4-digit ----------------------------------------------------------------------
+    ## NAICS 6-digit -------------------------------------------------------------------
+    naics_occupation = (
+        pd.read_excel(
+            path.join(RAW_DATA_DIR, "factor_data_naics-missing_occupations.xlsx"),
+            dtype={"naics": str},
+        )
+        .merge(
+            naics_classification[["code", "naics_id"]], left_on="naics", right_on="code"
+        )
+        .drop(columns=["code", "naics"])
+        .replace("na", np.NaN)
+    )
+
+    ### Append avail_pct to factor table and rename to percent of occupations present
+    # naics_df = naics_df.merge(
+    #     naics_occupation[["naics_id", "avail_pct"]], on="naics_id"
+    # ).rename(columns={"avail_pct": "pct_occupations_present"})
+
+    naics_occupation = naics_occupation.drop(columns=["avail_pct"])
+    naics_occupation = pd.melt(naics_occupation, id_vars="naics_id")
+
+    # Format Proximity data ------------------------------------------------------------
+    ## HS 4-digit ----------------------------------------------------------------------
+    hs_prox = pd.read_csv(
+        path.join(RAW_DATA_DIR, "hs92_proximities.csv"),
+        dtype={"commoditycode_1": str, "commoditycode_2": str},
+    )
+
+    hs_prox = (
+        hs_prox.merge(
+            hs_classification[["code", "hs_id"]],
+            left_on="commoditycode_2",
+            right_on="code",
+        )
+        .drop(columns=["code", "commoditycode_2"])
+        .rename(columns={"hs_id": "partner_id"})
+        .merge(
+            hs_classification[["code", "hs_id"]],
+            left_on="commoditycode_1",
+            right_on="code",
+        )
+        .drop(columns=["code", "commoditycode_1"])
+    )
+
+    ### Filter same ID-partner pairs
+    hs_prox = hs_prox[hs_prox.hs_id != hs_prox.partner_id]
+
+    ### Create rank variable (higher proximity is better)
+    hs_prox["rank"] = hs_prox.groupby("hs_id").proximity.rank(
+        ascending=False, method="max"
+    )
+
+    ### Filter to limit each product to no more than 10 partners
+    hs_prox = hs_prox[hs_prox["rank"] <= 10]
+
+    ## NAICS 6-digit -------------------------------------------------------------------
+    with open(
+        path.join(RAW_DATA_DIR, "NAICS-industry-industry-proximity-top-values.json"),
+        "r",
+    ) as f:
+        j = json.load(f)
+
+    naics_prox_data = []
+
+    for node in j.get("nodes"):
+        src = node.get("id")
+        for edge in node.get("edges"):
+            edge["src"] = src
+            naics_prox_data.append(edge)
+
+    naics_prox = pd.DataFrame(naics_prox_data).rename(
+        columns={"src": "naics_id", "trg": "partner_id"}
+    )
+
+    ### Filter same ID-partner pairs
+    naics_prox = naics_prox[naics_prox.naics_id != naics_prox.partner_id]
+
+    ### Create rank variable (higher proximity is better)
+    naics_prox["rank"] = naics_prox.groupby("naics_id").proximity.rank(
+        ascending=False, method="max"
+    )
+
+    ### Filter to limit each product to no more than 10 partners
+    naics_prox = naics_prox[naics_prox["rank"] <= 10]
+
     # Save files -----------------------------------------------------------------------
     hs_classification.to_csv(
         path.join(PROCESSED_DATA_DIR, "hs_classification.csv"), index=False
@@ -99,3 +218,10 @@ if __name__ == "__main__":
     )
     hs_df.to_csv(path.join(PROCESSED_DATA_DIR, "hs_factors.csv"), index=False)
     naics_df.to_csv(path.join(PROCESSED_DATA_DIR, "naics_factors.csv"), index=False)
+
+    hs_relative_demand.to_csv(
+        path.join(PROCESSED_DATA_DIR, "hs_relative_demand.csv"), index=False
+    )
+
+    hs_prox.to_csv(path.join(PROCESSED_DATA_DIR, "hs_proximity.csv"), index=False)
+    naics_prox.to_csv(path.join(PROCESSED_DATA_DIR, "naics_proximity.csv"), index=False)

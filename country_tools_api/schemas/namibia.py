@@ -7,31 +7,52 @@ from database import namibia as namibia_db
 
 from .util import sqlalchemy_filter
 
-# HS Classification
+
 class NamibiaHSClassification(SQLAlchemyObjectType):
     class Meta:
         model = namibia_db.NamibiaHSClassification
         interfaces = (graphene.relay.Node,)
 
 
-# NAICS Classification
 class NamibiaNAICSClassification(SQLAlchemyObjectType):
     class Meta:
         model = namibia_db.NamibiaNAICSClassification
         interfaces = (graphene.relay.Node,)
 
 
-# HS Factors
 class NamibiaHSFactors(SQLAlchemyObjectType):
     class Meta:
         model = namibia_db.NamibiaHSFactors
         interfaces = (graphene.relay.Node,)
 
 
-# NAICS Factors
 class NamibiaNAICSFactors(SQLAlchemyObjectType):
     class Meta:
         model = namibia_db.NamibiaNAICSFactors
+        interfaces = (graphene.relay.Node,)
+
+
+class NamibiaHSProximity(SQLAlchemyObjectType):
+    class Meta:
+        model = namibia_db.NamibiaHSProximity
+        interfaces = (graphene.relay.Node,)
+
+
+class NamibiaNAICSProximity(SQLAlchemyObjectType):
+    class Meta:
+        model = namibia_db.NamibiaNAICSProximity
+        interfaces = (graphene.relay.Node,)
+
+
+class NamibiaHSRelativeDemand(SQLAlchemyObjectType):
+    class Meta:
+        model = namibia_db.NamibiaHSRelativeDemand
+        interfaces = (graphene.relay.Node,)
+
+
+class NamibiaNAICSRelativeDemand(SQLAlchemyObjectType):
+    class Meta:
+        model = namibia_db.NamibiaNAICSRelativeDemand
         interfaces = (graphene.relay.Node,)
 
 
