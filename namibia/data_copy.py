@@ -6,8 +6,6 @@ from country_tools_api.database.base import engine, Base
 from country_tools_api.database.namibia import (
     NamibiaHSClassification,
     NamibiaNAICSClassification,
-    NamibiaHSFactors,
-    NamibiaNAICSFactors,
 )
 
 
@@ -19,7 +17,9 @@ NAM_TABLES = [
     "hs_factors",
     "naics_factors",
     "hs_relative_demand",
-    # "naics_relative_demand",
+    "naics_relative_demand",
+    "hs_occupation",
+    "naics_occupation",
     "hs_proximity",
     "naics_proximity",
 ]

@@ -85,6 +85,32 @@ class NamibiaNAICSRelativeDemand(Base):
     country_demand_pc_avg = Column(Float)
 
 
+class NamibiaHSOccupation(Base):
+    __tablename__ = "hs_occupation"
+    __table_args__ = (
+        PrimaryKeyConstraint("hs_id", "occupation"),
+        {"schema": "namibia"},
+    )
+
+    hs_id = Column(Integer)
+    occupation = Column(String)
+    is_available = Column(Boolean)
+    rank = Column(Integer)
+
+
+class NamibiaNAICSOccupation(Base):
+    __tablename__ = "naics_occupation"
+    __table_args__ = (
+        PrimaryKeyConstraint("naics_id", "occupation"),
+        {"schema": "namibia"},
+    )
+
+    naics_id = Column(Integer)
+    occupation = Column(String)
+    is_available = Column(Boolean)
+    rank = Column(Integer)
+
+
 class NamibiaHSProximity(Base):
     __tablename__ = "hs_proximity"
     __table_args__ = (
@@ -133,6 +159,9 @@ class NamibiaHSClassification(Base):
     proximity = relationship(
         "NamibiaHSProximity", primaryjoin=(hs_id == foreign(NamibiaHSProximity.hs_id))
     )
+    occupation = relationship(
+        "NamibiaHSOccupation", primaryjoin=(hs_id == foreign(NamibiaHSOccupation.hs_id))
+    )
 
 
 class NamibiaNAICSClassification(Base):
@@ -158,4 +187,8 @@ class NamibiaNAICSClassification(Base):
     proximity = relationship(
         "NamibiaNAICSProximity",
         primaryjoin=(naics_id == foreign(NamibiaNAICSProximity.naics_id)),
+    )
+    occupation = relationship(
+        "NamibiaNAICSOccupation",
+        primaryjoin=(naics_id == foreign(NamibiaNAICSOccupation.naics_id)),
     )

@@ -56,6 +56,18 @@ class NamibiaNAICSRelativeDemand(SQLAlchemyObjectType):
         interfaces = (graphene.relay.Node,)
 
 
+class NamibiaHSOccupation(SQLAlchemyObjectType):
+    class Meta:
+        model = namibia_db.NamibiaHSOccupation
+        interfaces = (graphene.relay.Node,)
+
+
+class NamibiaNAICSOccupation(SQLAlchemyObjectType):
+    class Meta:
+        model = namibia_db.NamibiaNAICSOccupation
+        interfaces = (graphene.relay.Node,)
+
+
 class NamibiaQuery(graphene.ObjectType):
     namibia_hs_list = graphene.List(
         NamibiaHSClassification,

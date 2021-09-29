@@ -94,6 +94,16 @@ if __name__ == "__main__":
 
     # Merge Industry Now product-level factors -----------------------------------------
     ## HS 4-digit ----------------------------------------------------------------------
+    hs_eg = (
+        pd.read_csv(
+            path.join(RAW_DATA_DIR, "factor_data_hs4-employment_groups.csv"),
+            dtype={"hs4": str},
+        )
+        .merge(hs_classification[["code", "hs_id"]], left_on="hs4", right_on="code")
+        .drop(columns=["code", "hs4"])
+    )
+
+    hs_df = hs_df.merge(hs_eg, on="hs_id", how="left")
 
     ## NAICS 6-digit -------------------------------------------------------------------
     naics_eg = (
@@ -121,29 +131,49 @@ if __name__ == "__main__":
     )
 
     ## NAICS 6-digit -------------------------------------------------------------------
-
-    # Format occupational data ---------------------------------------------------------
-    ## HS 4-digit ----------------------------------------------------------------------
-    ## NAICS 6-digit -------------------------------------------------------------------
-    naics_occupation = (
-        pd.read_excel(
-            path.join(RAW_DATA_DIR, "factor_data_naics-missing_occupations.xlsx"),
+    naics_relative_demand = (
+        pd.read_csv(
+            path.join(RAW_DATA_DIR, "factor_data_naics-relative_demand.csv"),
             dtype={"naics": str},
         )
         .merge(
             naics_classification[["code", "naics_id"]], left_on="naics", right_on="code"
         )
         .drop(columns=["code", "naics"])
-        .replace("na", np.NaN)
     )
 
-    ### Append avail_pct to factor table and rename to percent of occupations present
-    # naics_df = naics_df.merge(
-    #     naics_occupation[["naics_id", "avail_pct"]], on="naics_id"
-    # ).rename(columns={"avail_pct": "pct_occupations_present"})
+    # Format occupational data ---------------------------------------------------------
+    ## HS 4-digit ----------------------------------------------------------------------
+    hs_occupation = (
+        pd.read_excel(
+            path.join(RAW_DATA_DIR, "LIST_factor_data_hs4-top_occupations.xlsx"),
+            dtype={"hs4": str},
+        )
+        .merge(hs_classification[["code", "hs_id"]], left_on="hs4", right_on="code")
+        .drop(columns=["code", "hs4"])
+    )
+    hs_occupation["is_available"] = hs_occupation.avail_rank.notna()
+    hs_occupation["rank"] = hs_occupation.avail_rank.combine_first(
+        hs_occupation.missing_rank
+    )
+    hs_occupation = hs_occupation.drop(columns=["avail_rank", "missing_rank"])
 
-    naics_occupation = naics_occupation.drop(columns=["avail_pct"])
-    naics_occupation = pd.melt(naics_occupation, id_vars="naics_id")
+    ## NAICS 6-digit -------------------------------------------------------------------
+    naics_occupation = (
+        pd.read_csv(
+            path.join(RAW_DATA_DIR, "LIST_factor_data_naics-top_occupations.csv"),
+            dtype={"naics": str},
+        )
+        .merge(
+            naics_classification[["code", "naics_id"]], left_on="naics", right_on="code"
+        )
+        .drop(columns=["code", "naics"])
+    )
+    naics_occupation["is_available"] = naics_occupation.avail_rank.notna()
+    naics_occupation["rank"] = naics_occupation.avail_rank.combine_first(
+        naics_occupation.missing_rank
+    )
+    naics_occupation = naics_occupation.drop(columns=["avail_rank", "missing_rank"])
 
     # Format Proximity data ------------------------------------------------------------
     ## HS 4-digit ----------------------------------------------------------------------
@@ -221,6 +251,16 @@ if __name__ == "__main__":
 
     hs_relative_demand.to_csv(
         path.join(PROCESSED_DATA_DIR, "hs_relative_demand.csv"), index=False
+    )
+    naics_relative_demand.to_csv(
+        path.join(PROCESSED_DATA_DIR, "naics_relative_demand.csv"), index=False
+    )
+
+    hs_occupation.to_csv(
+        path.join(PROCESSED_DATA_DIR, "hs_occupation.csv"), index=False
+    )
+    naics_occupation.to_csv(
+        path.join(PROCESSED_DATA_DIR, "naics_occupation.csv"), index=False
     )
 
     hs_prox.to_csv(path.join(PROCESSED_DATA_DIR, "hs_proximity.csv"), index=False)
