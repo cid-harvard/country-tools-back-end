@@ -213,10 +213,6 @@ class JordanIndustry(Base):
         "JordanFactors",
         primaryjoin=(industry_code == foreign(JordanFactors.industry_code)),
     )
-    global_top_fdi = relationship(
-        "JordanGlobalTopFDI",
-        primaryjoin=(industry_code == foreign(JordanGlobalTopFDI.industry_code)),
-    )
     map_location = relationship(
         "JordanMapLocation",
         primaryjoin=(industry_code == foreign(JordanMapLocation.industry_code)),
@@ -232,10 +228,6 @@ class JordanIndustry(Base):
     over_time = relationship(
         "JordanOverTime",
         primaryjoin=(industry_code == foreign(JordanOverTime.industry_code)),
-    )
-    region_top_fdi = relationship(
-        "JordanRegionTopFDI",
-        primaryjoin=(industry_code == foreign(JordanRegionTopFDI.industry_code)),
     )
     schooling = relationship(
         "JordanSchooling",

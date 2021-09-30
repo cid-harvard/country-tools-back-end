@@ -43,7 +43,7 @@ if __name__ == "__main__":
     nationality.to_csv(f"{PROCESSED_DATA_DIR}/nationality.csv", index=False)
 
     ### CONTROL ------------------------------------------------------------------------
-    control_sheets = ["laborControl", "womenControl", "fdiControl"]
+    control_sheets = ["laborControl", "womenControl"]
     control = industry[["industry_code"]]
 
     for sheet in control_sheets:
@@ -75,25 +75,6 @@ if __name__ == "__main__":
         df.columns = cols
         text = text.merge(df, how="left", left_on="industry_code", right_index=True)
     text.to_csv(f"{PROCESSED_DATA_DIR}/text.csv", index=False)
-
-    ### TOP FDI ------------------------------------------------------------------------
-    top_fdi_sheets = {
-        "FDItop10global": "global_top_fdi",
-        "FDItop10region": "region_top_fdi",
-    }
-    for sheet, new_sheet in top_fdi_sheets.items():
-        df = pd.read_csv(f"{RAW_DATA_DIR}/{sheet}.csv").drop(
-            columns=["sic4_description", "total_company_capinv", "industries119"],
-            errors="ignore",
-        )
-        df.columns = (
-            "industry_code",
-            "company",
-            "source_country",
-            "capital_investment",
-            "rank",
-        )
-        df.to_csv(f"{PROCESSED_DATA_DIR}/{new_sheet}.csv", index=False)
 
     ### FACTORS ------------------------------------------------------------------------
     factors = industry[["industry_code"]]
@@ -149,7 +130,8 @@ if __name__ == "__main__":
         ]
     )
 
-    over_time_sheets = {"fdiBarChart": "fdi_bar_chart", "histogram": "histogram"}
+    # This also used to have FDI overtime data, but removed
+    over_time_sheets = {"histogram": "histogram"}
 
     for sheet, viz_title in over_time_sheets.items():
         df = (
@@ -177,8 +159,6 @@ if __name__ == "__main__":
             )
         )
         df["visualization"] = viz_title
-        if viz_title == "fdi_bar_chart":
-            df["variable"] = "fdi_bar_chart"
         over_time = over_time.append(df)
 
     over_time.to_csv(f"{PROCESSED_DATA_DIR}/over_time.csv", index=False)
