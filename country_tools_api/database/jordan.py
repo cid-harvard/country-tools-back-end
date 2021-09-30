@@ -139,36 +139,6 @@ class JordanMapLocation(Base):
     share_country = Column(String)
 
 
-class JordanGlobalTopFDI(Base):
-
-    __tablename__ = "global_top_fdi"
-    __table_args__ = (
-        PrimaryKeyConstraint("industry_code", "rank"),
-        {"schema": "jordan"},
-    )
-
-    industry_code = Column(Integer)
-    rank = Column(Integer)
-    company = Column(String)
-    source_country = Column(String)
-    capital_investment = Column(Float)
-
-
-class JordanRegionTopFDI(Base):
-
-    __tablename__ = "region_top_fdi"
-    __table_args__ = (
-        PrimaryKeyConstraint("industry_code", "rank"),
-        {"schema": "jordan"},
-    )
-
-    industry_code = Column(Integer)
-    rank = Column(Integer)
-    company = Column(String)
-    source_country = Column(String)
-    capital_investment = Column(Float)
-
-
 class JordanFactors(Base):
 
     __tablename__ = "factors"
