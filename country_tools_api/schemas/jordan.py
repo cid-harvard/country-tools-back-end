@@ -56,18 +56,6 @@ class JordanMapLocation(SQLAlchemyObjectType):
         interfaces = (graphene.relay.Node,)
 
 
-class JordanGlobalTopFDI(SQLAlchemyObjectType):
-    class Meta:
-        model = jordan_db.JordanGlobalTopFDI
-        interfaces = (graphene.relay.Node,)
-
-
-class JordanRegionTopFDI(SQLAlchemyObjectType):
-    class Meta:
-        model = jordan_db.JordanRegionTopFDI
-        interfaces = (graphene.relay.Node,)
-
-
 class JordanFactors(SQLAlchemyObjectType):
     class Meta:
         model = jordan_db.JordanFactors
