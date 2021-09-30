@@ -22,23 +22,6 @@ class AlbaniaCountry(SQLAlchemyObjectType):
         interfaces = (graphene.relay.Node,)
 
 
-# FDI Markets
-class AlbaniaFDIMarkets(SQLAlchemyObjectType):
-    class Meta:
-        model = albania_db.AlbaniaFDIMarkets
-        interfaces = (graphene.relay.Node,)
-
-
-# FDI Markets Overtime
-class AlbaniaFDIMarketsOvertime(SQLAlchemyObjectType):
-    class Meta:
-        model = albania_db.AlbaniaFDIMarketsOvertime
-        interfaces = (graphene.relay.Node,)
-
-    # Graphene can't handle enum options starting with non-alpha characters
-    destination = graphene.String()
-
-
 # Viability
 class AlbaniaFactors(SQLAlchemyObjectType):
     class Meta:
@@ -106,13 +89,6 @@ class AlbaniaQuery(graphene.ObjectType):
         AlbaniaNACEIndustry, nace_id=graphene.Int(required=True)
     )
     country = graphene.List(AlbaniaCountry, location_id=graphene.Int())
-    fdi_markets = graphene.List(AlbaniaFDIMarkets, nace_id=graphene.Int())
-    protected_fdi_markets = graphene.List(
-        AlbaniaFDIMarkets, nace_id=graphene.Int(), key=graphene.String(required=True)
-    )
-    fdi_markets_overtime = graphene.List(
-        AlbaniaFDIMarketsOvertime, nace_id=graphene.Int()
-    )
     factors = graphene.List(AlbaniaFactors, nace_id=graphene.Int())
     script = graphene.List(AlbaniaScript)
 
@@ -142,17 +118,6 @@ class AlbaniaQuery(graphene.ObjectType):
 
     def resolve_country(self, info, **args):
         return sqlalchemy_filter(args, albania_db.AlbaniaCountry, "location_id")
-
-    def resolve_fdi_markets(self, info, **args):
-        return sqlalchemy_filter(args, albania_db.AlbaniaFDIMarkets, "nace_id")
-
-    def resolve_protected_fdi_markets(self, info, **args):
-        if args["key"] != "albania2020":
-            return None
-        return sqlalchemy_filter(args, albania_db.AlbaniaFDIMarkets, "nace_id")
-
-    def resolve_fdi_markets_overtime(self, info, **args):
-        return sqlalchemy_filter(args, albania_db.AlbaniaFDIMarketsOvertime, "nace_id")
 
     def resolve_factors(self, info, **args):
         return sqlalchemy_filter(args, albania_db.AlbaniaFactors, "nace_id")
