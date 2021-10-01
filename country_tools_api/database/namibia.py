@@ -125,7 +125,7 @@ class NamibiaHSProximity(Base):
     proximity = Column(Float)
     rank = Column(Integer)
     factors = relationship(
-        "NamibiaHSFactors", primaryjoin=(hs_id == foreign(NamibiaHSFactors.hs_id))
+        "NamibiaHSFactors", primaryjoin=(partner_id == foreign(NamibiaHSFactors.hs_id))
     )
 
 
@@ -142,7 +142,7 @@ class NamibiaNAICSProximity(Base):
     rank = Column(Integer)
     factors = relationship(
         "NamibiaNAICSFactors",
-        primaryjoin=(naics_id == foreign(NamibiaNAICSFactors.naics_id)),
+        primaryjoin=(partner_id == foreign(NamibiaNAICSFactors.naics_id)),
     )
 
 
