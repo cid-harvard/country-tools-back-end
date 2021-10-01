@@ -85,12 +85,29 @@ if __name__ == "__main__":
     hs_df["attractiveness"] = hs_df[ATTRACTIVENESS_COLS].mean(axis=1)
     hs_df["feasibility"] = hs_df[FEASIBILITY_COLS].mean(axis=1)
 
+    hs_rca = pd.read_csv(path.join(RAW_DATA_DIR, "rca_hs.csv")).rename(
+        columns={"product_id": "hs_id", "export_rca": "rca"}
+    )[["hs_id", "rca"]]
+
+    hs_df = hs_df.merge(hs_rca, on="hs_id", how="left")
+
     ## NAICS 6-digit -------------------------------------------------------------------
     naics_df = naics_df.merge(
         naics_classification[["code", "naics_id"]], left_on="naics", right_on="code"
     )[["naics_id", *ATTRACTIVENESS_COLS, *FEASIBILITY_COLS]]
     naics_df["attractiveness"] = naics_df[ATTRACTIVENESS_COLS].mean(axis=1)
     naics_df["feasibility"] = naics_df[FEASIBILITY_COLS].mean(axis=1)
+
+    naics_rca = (
+        pd.read_csv(path.join(RAW_DATA_DIR, "rca_naics.csv"), dtype={"naics": str})
+        .rename(columns={"rca_naics": "rca"})[["naics", "rca"]]
+        .merge(
+            naics_classification[["code", "naics_id"]], left_on="naics", right_on="code"
+        )
+        .drop(columns=["code", "naics"])
+    )
+
+    naics_df = naics_df.merge(naics_rca, on="naics_id", how="left")
 
     # Merge Industry Now product-level factors -----------------------------------------
     ## HS 4-digit ----------------------------------------------------------------------
@@ -239,6 +256,18 @@ if __name__ == "__main__":
     ### Filter to limit each product to no more than 10 partners
     naics_prox = naics_prox[naics_prox["rank"] <= 10]
 
+    # Threshold Values -----------------------------------------------------------------
+
+    thresh = {
+        "hs_attractiveness_avg": hs_df.attractiveness.mean(),
+        "hs_feasibility_avg": hs_df.feasibility.mean(),
+        "naics_attractiveness_avg": naics_df.attractiveness.mean(),
+        "naics_feasibility_avg": naics_df.feasibility.mean(),
+    }
+
+    thresh = pd.DataFrame.from_dict(thresh, orient="index").reset_index()
+    thresh.columns = ("key", "value")
+
     # Save files -----------------------------------------------------------------------
     hs_classification.to_csv(
         path.join(PROCESSED_DATA_DIR, "hs_classification.csv"), index=False
@@ -265,3 +294,5 @@ if __name__ == "__main__":
 
     hs_prox.to_csv(path.join(PROCESSED_DATA_DIR, "hs_proximity.csv"), index=False)
     naics_prox.to_csv(path.join(PROCESSED_DATA_DIR, "naics_proximity.csv"), index=False)
+
+    thresh.to_csv(path.join(PROCESSED_DATA_DIR, "threshold.csv"), index=False)
