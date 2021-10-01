@@ -68,6 +68,12 @@ class NamibiaNAICSOccupation(SQLAlchemyObjectType):
         interfaces = (graphene.relay.Node,)
 
 
+class NamibiaThreshold(SQLAlchemyObjectType):
+    class Meta:
+        model = namibia_db.NamibiaThreshold
+        interfaces = (graphene.relay.Node,)
+
+
 class NamibiaQuery(graphene.ObjectType):
     namibia_hs_list = graphene.List(
         NamibiaHSClassification,
@@ -86,6 +92,11 @@ class NamibiaQuery(graphene.ObjectType):
     namibia_naics = graphene.Field(
         NamibiaNAICSClassification, naics_id=graphene.Int(required=True)
     )
+
+    namibia_threshold = graphene.Field(
+        NamibiaThreshold, key=graphene.String(required=True)
+    )
+    namibia_threshold_list = graphene.List(NamibiaThreshold)
 
     def resolve_namibia_hs_list(self, info, **args):
         q = db_session.query(namibia_db.NamibiaHSClassification)
@@ -127,3 +138,11 @@ class NamibiaQuery(graphene.ObjectType):
             )
             .one()
         )
+
+    def resolve_namibia_threshold(self, info, **args):
+        return db_session.query(namibia_db.NamibiaThreshold).filter(
+            getattr(namibia_db.NamibiaThreshold, "key") == args["key"]
+        )
+
+    def resolve_namibia_threshold_list(self, info, **args):
+        return db_session.query(namibia_db.NamibiaThreshold)

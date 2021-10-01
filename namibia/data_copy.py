@@ -22,6 +22,7 @@ NAM_TABLES = [
     "naics_occupation",
     "hs_proximity",
     "naics_proximity",
+    "threshold",
 ]
 
 

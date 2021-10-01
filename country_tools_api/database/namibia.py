@@ -30,6 +30,7 @@ class NamibiaHSFactors(Base):
     f_input_availability = Column(Float)
     attractiveness = Column(Float)
     feasibility = Column(Float)
+    rca = Column(Float)
     share_female = Column(Float)
     share_youth = Column(Float)
     share_lskill = Column(Float)
@@ -53,6 +54,7 @@ class NamibiaNAICSFactors(Base):
     f_input_availability = Column(Float)
     attractiveness = Column(Float)
     feasibility = Column(Float)
+    rca = Column(Float)
     share_female = Column(Float)
     share_youth = Column(Float)
     share_lskill = Column(Float)
@@ -122,6 +124,9 @@ class NamibiaHSProximity(Base):
     partner_id = Column(Integer)
     proximity = Column(Float)
     rank = Column(Integer)
+    factors = relationship(
+        "NamibiaHSFactors", primaryjoin=(hs_id == foreign(NamibiaHSFactors.hs_id))
+    )
 
 
 class NamibiaNAICSProximity(Base):
@@ -135,6 +140,10 @@ class NamibiaNAICSProximity(Base):
     partner_id = Column(Integer)
     proximity = Column(Float)
     rank = Column(Integer)
+    factors = relationship(
+        "NamibiaNAICSFactors",
+        primaryjoin=(naics_id == foreign(NamibiaNAICSFactors.naics_id)),
+    )
 
 
 class NamibiaHSClassification(Base):
@@ -192,3 +201,11 @@ class NamibiaNAICSClassification(Base):
         "NamibiaNAICSOccupation",
         primaryjoin=(naics_id == foreign(NamibiaNAICSOccupation.naics_id)),
     )
+
+
+class NamibiaThreshold(Base):
+    __tablename__ = "threshold"
+    __table_args__ = {"schema": "namibia"}
+
+    key = Column(String, primary_key=True)
+    value = Column(Float)
