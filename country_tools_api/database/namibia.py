@@ -98,6 +98,7 @@ class NamibiaHSOccupation(Base):
     occupation = Column(String)
     is_available = Column(Boolean)
     rank = Column(Integer)
+    pct_share = Column(Float)
 
 
 class NamibiaNAICSOccupation(Base):
@@ -111,6 +112,7 @@ class NamibiaNAICSOccupation(Base):
     occupation = Column(String)
     is_available = Column(Boolean)
     rank = Column(Integer)
+    pct_share = Column(Float)
 
 
 class NamibiaHSProximity(Base):
