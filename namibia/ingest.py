@@ -25,20 +25,20 @@ if __name__ == "__main__":
     # Load A/V factor files ------------------------------------------------------------
     ## HS 4-digit
     hs_df = pd.read_csv(
-        path.join(RAW_DATA_DIR, "HS4_universe_nam_investment_tool.csv"),
+        path.join(RAW_DATA_DIR, "HS4", "HS4_universe_nam_investment_tool.csv"),
         dtype={"hs4": str},
     )
 
     ## NAICS 6-digit
     naics_df = pd.read_csv(
-        path.join(RAW_DATA_DIR, "NAICS_universe_nam_investment_tool.csv"),
+        path.join(RAW_DATA_DIR, "HS4", "NAICS_universe_nam_investment_tool.csv"),
         dtype={"naics": str},
     )
 
     # Classifications ------------------------------------------------------------------
     ## HS 4-digit Classification -------------------------------------------------------
     hs_classification = pd.read_csv(
-        path.join(RAW_DATA_DIR, "hs_classification.csv")
+        path.join(RAW_DATA_DIR, "classifications", "hs_classification.csv")
     ).rename(columns={"id": "hs_id", "name_short_en": "name"})
     hs_classification = hs_classification[hs_classification.level == "4digit"]
     hs_classification = hs_classification[
@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
     ## NAICS 6-digit Classification ----------------------------------------------------
     naics_classification = pd.read_csv(
-        path.join(RAW_DATA_DIR, "naics_classification.csv")
+        path.join(RAW_DATA_DIR, "classifications", "naics_classification.csv")
     )
     naics_classification = naics_classification[naics_classification.level == 6]
     naics_classification = naics_classification[
@@ -85,9 +85,11 @@ if __name__ == "__main__":
     hs_df["attractiveness"] = hs_df[ATTRACTIVENESS_COLS].mean(axis=1)
     hs_df["feasibility"] = hs_df[FEASIBILITY_COLS].mean(axis=1)
 
-    hs_rca = pd.read_csv(path.join(RAW_DATA_DIR, "rca_hs.csv")).rename(
-        columns={"product_id": "hs_id", "export_rca": "rca"}
-    )[["hs_id", "rca"]]
+    hs_rca = (
+        pd.read_csv(path.join(RAW_DATA_DIR, "rca_hs.csv"))
+        .rename(columns={"product_id": "hs_id", "export_rca": "rca"})[["hs_id", "rca"]]
+        .drop_duplicates()
+    )
 
     hs_df = hs_df.merge(hs_rca, on="hs_id", how="left")
 
@@ -99,12 +101,15 @@ if __name__ == "__main__":
     naics_df["feasibility"] = naics_df[FEASIBILITY_COLS].mean(axis=1)
 
     naics_rca = (
-        pd.read_csv(path.join(RAW_DATA_DIR, "rca_naics.csv"), dtype={"naics": str})
-        .rename(columns={"rca_naics": "rca"})[["naics", "rca"]]
+        pd.read_csv(
+            path.join(RAW_DATA_DIR, "HS4", "rca_naics.csv"), dtype={"naics": str}
+        )
+        .rename(columns={"rca_mean": "rca"})[["naics", "rca"]]
         .merge(
             naics_classification[["code", "naics_id"]], left_on="naics", right_on="code"
         )
         .drop(columns=["code", "naics"])
+        .drop_duplicates()
     )
 
     naics_df = naics_df.merge(naics_rca, on="naics_id", how="left")
@@ -112,8 +117,14 @@ if __name__ == "__main__":
     # Merge Industry Now product-level factors -----------------------------------------
     ## HS 4-digit ----------------------------------------------------------------------
     hs_eg = (
-        pd.read_csv(
-            path.join(RAW_DATA_DIR, "factor_data_hs4-employment_groups.csv"),
+        pd.read_excel(
+            path.join(
+                RAW_DATA_DIR,
+                "HS4",
+                "Industry Characteristics - Visualization Data",
+                "Employment Groups of Interest",
+                "factor_data_hs4-employment_groups.xlsx",
+            ),
             dtype={"hs4": str},
         )
         .merge(hs_classification[["code", "hs_id"]], left_on="hs4", right_on="code")
@@ -125,7 +136,13 @@ if __name__ == "__main__":
     ## NAICS 6-digit -------------------------------------------------------------------
     naics_eg = (
         pd.read_csv(
-            path.join(RAW_DATA_DIR, "factor_data_naics-employment_groups.csv"),
+            path.join(
+                RAW_DATA_DIR,
+                "HS4",
+                "Industry Characteristics - Visualization Data",
+                "Employment Groups of Interest",
+                "factor_data_naics-employment_groups.csv",
+            ),
             dtype={"naics": str},
         )
         .merge(
@@ -139,8 +156,14 @@ if __name__ == "__main__":
     # Format country relative demand per product/industry ---------------------------------------
     ## HS 4-digit ----------------------------------------------------------------------
     hs_relative_demand = (
-        pd.read_csv(
-            path.join(RAW_DATA_DIR, "factor_data_hs4-relative_demand.csv"),
+        pd.read_excel(
+            path.join(
+                RAW_DATA_DIR,
+                "HS4",
+                "Industry Characteristics - Visualization Data",
+                "Relative Demand",
+                "factor_data_hs4-relative_demand_rounded.xlsx",
+            ),
             dtype={"hs4": str},
         )
         .merge(hs_classification[["code", "hs_id"]], left_on="hs4", right_on="code")
@@ -150,7 +173,13 @@ if __name__ == "__main__":
     ## NAICS 6-digit -------------------------------------------------------------------
     naics_relative_demand = (
         pd.read_csv(
-            path.join(RAW_DATA_DIR, "factor_data_naics-relative_demand.csv"),
+            path.join(
+                RAW_DATA_DIR,
+                "HS4",
+                "Industry Characteristics - Visualization Data",
+                "Relative Demand",
+                "factor_data_naics-relative_demand_rounded.csv",
+            ),
             dtype={"naics": str},
         )
         .merge(
@@ -163,7 +192,13 @@ if __name__ == "__main__":
     ## HS 4-digit ----------------------------------------------------------------------
     hs_occupation = (
         pd.read_excel(
-            path.join(RAW_DATA_DIR, "LIST_factor_data_hs4-top_occupations.xlsx"),
+            path.join(
+                RAW_DATA_DIR,
+                "HS4",
+                "Industry Characteristics - Visualization Data",
+                "Input Availability - Occupations",
+                "LIST_factor_data_hs4-top_occupations_withshares.xlsx",
+            ),
             dtype={"hs4": str},
         )
         .merge(hs_classification[["code", "hs_id"]], left_on="hs4", right_on="code")
@@ -173,12 +208,23 @@ if __name__ == "__main__":
     hs_occupation["rank"] = hs_occupation.avail_rank.combine_first(
         hs_occupation.missing_rank
     )
-    hs_occupation = hs_occupation.drop(columns=["avail_rank", "missing_rank"])
+    hs_occupation["pct_share"] = hs_occupation.avail_pct_share.combine_first(
+        hs_occupation.missing_pct_share
+    )
+    hs_occupation = hs_occupation.drop(
+        columns=["avail_rank", "missing_rank", "avail_pct_share", "missing_pct_share"]
+    )
 
     ## NAICS 6-digit -------------------------------------------------------------------
     naics_occupation = (
         pd.read_csv(
-            path.join(RAW_DATA_DIR, "LIST_factor_data_naics-top_occupations.csv"),
+            path.join(
+                RAW_DATA_DIR,
+                "HS4",
+                "Industry Characteristics - Visualization Data",
+                "Input Availability - Occupations",
+                "LIST_factor_data_naics-top_occupations_withshares.csv",
+            ),
             dtype={"naics": str},
         )
         .merge(
@@ -190,7 +236,12 @@ if __name__ == "__main__":
     naics_occupation["rank"] = naics_occupation.avail_rank.combine_first(
         naics_occupation.missing_rank
     )
-    naics_occupation = naics_occupation.drop(columns=["avail_rank", "missing_rank"])
+    naics_occupation["pct_share"] = naics_occupation.avail_pct_share.combine_first(
+        naics_occupation.missing_pct_share
+    )
+    naics_occupation = naics_occupation.drop(
+        columns=["avail_rank", "missing_rank", "avail_pct_share", "missing_pct_share"]
+    )
 
     # Format Proximity data ------------------------------------------------------------
     ## HS 4-digit ----------------------------------------------------------------------
@@ -258,11 +309,29 @@ if __name__ == "__main__":
 
     # Threshold Values -----------------------------------------------------------------
 
+    employment_avgshares = pd.read_excel(
+        path.join(
+            RAW_DATA_DIR,
+            "HS4",
+            "Industry Characteristics - Visualization Data",
+            "Employment Groups of Interest",
+            "factor_data_naics-employment_groups_econ_avgshares.xlsx",
+        )
+    )
+    employment_avgshares = employment_avgshares.set_index("interest_group").T
+
     thresh = {
         "hs_attractiveness_avg": hs_df.attractiveness.mean(),
         "hs_feasibility_avg": hs_df.feasibility.mean(),
         "naics_attractiveness_avg": naics_df.attractiveness.mean(),
         "naics_feasibility_avg": naics_df.feasibility.mean(),
+        "hs_attractiveness_med": hs_df.attractiveness.median(),
+        "hs_feasibility_med": hs_df.feasibility.median(),
+        "naics_attractiveness_med": naics_df.attractiveness.median(),
+        "naics_feasibility_med": naics_df.feasibility.median(),
+        "employment_female_avg": employment_avgshares.female[0] / 100.0,
+        "employment_youth_avg": employment_avgshares.youth[0] / 100.0,
+        "employment_lskill_avg": employment_avgshares.lskill[0] / 100.0,
     }
 
     thresh = pd.DataFrame.from_dict(thresh, orient="index").reset_index()
@@ -275,8 +344,12 @@ if __name__ == "__main__":
     naics_classification.to_csv(
         path.join(PROCESSED_DATA_DIR, "naics_classification.csv"), index=False
     )
-    hs_df.to_csv(path.join(PROCESSED_DATA_DIR, "hs_factors.csv"), index=False)
-    naics_df.to_csv(path.join(PROCESSED_DATA_DIR, "naics_factors.csv"), index=False)
+    hs_df.drop_duplicates().to_csv(
+        path.join(PROCESSED_DATA_DIR, "hs_factors.csv"), index=False
+    )
+    naics_df.drop_duplicates().to_csv(
+        path.join(PROCESSED_DATA_DIR, "naics_factors.csv"), index=False
+    )
 
     hs_relative_demand.to_csv(
         path.join(PROCESSED_DATA_DIR, "hs_relative_demand.csv"), index=False
