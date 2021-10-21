@@ -28,6 +28,7 @@ if __name__ == "__main__":
         path.join(RAW_DATA_DIR, "HS4", "HS4_universe_nam_investment_tool.csv"),
         dtype={"hs4": str},
     )
+    hs_df.hs4 = hs_df.hs4.str.pad(4, fillchar="0")
 
     ## NAICS 6-digit
     naics_df = pd.read_csv(
