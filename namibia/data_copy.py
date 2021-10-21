@@ -13,15 +13,15 @@ NAM_SCHEMA = "namibia"
 NAM_PROCESSED_DATA_DIR = "./namibia/processed_data"
 NAM_TABLES = [
     "hs_classification",
-    "naics_classification",
     "hs_factors",
-    "naics_factors",
-    "hs_relative_demand",
-    "naics_relative_demand",
     "hs_occupation",
-    "naics_occupation",
     "hs_proximity",
+    "hs_relative_demand",
+    "naics_classification",
+    "naics_factors",
+    "naics_occupation",
     "naics_proximity",
+    "naics_relative_demand",
     "threshold",
 ]
 
