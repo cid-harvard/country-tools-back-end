@@ -1,9 +1,6 @@
 import pandas as pd
 import numpy as np
 
-RAW_DATA_DIR = "./raw_data"
-PROCESSED_DATA_DIR = "./processed_data"
-
 HUB_COLUMNS = {
     "PROJECT NAME": "project_name",
     "LINK": "link",
@@ -53,8 +50,12 @@ def format_enum(string):
 
 
 if __name__ == "__main__":
+
+    raw_data_dir = "./raw_data"
+    processed_data_dir = "./processed_data"
+
     projects = pd.read_csv(
-        f"./{RAW_DATA_DIR}/Growth Lab Digital Hub_Master List - Sheet1.csv"
+        f"{raw_data_dir}/Growth Lab Viz Hub_Master List - Sheet1.csv"
     )
 
     projects.columns = [x.strip() for x in projects.columns]
@@ -73,4 +74,4 @@ if __name__ == "__main__":
     projects.card_size = projects.card_size.apply(format_enum)
     projects.status = projects.status.apply(format_enum)
 
-    projects.to_csv(f"./{PROCESSED_DATA_DIR}/projects.csv", index=False)
+    projects.to_csv(f"{processed_data_dir}/projects.csv", index=False)

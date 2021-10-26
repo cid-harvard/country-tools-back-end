@@ -139,36 +139,6 @@ class JordanMapLocation(Base):
     share_country = Column(String)
 
 
-class JordanGlobalTopFDI(Base):
-
-    __tablename__ = "global_top_fdi"
-    __table_args__ = (
-        PrimaryKeyConstraint("industry_code", "rank"),
-        {"schema": "jordan"},
-    )
-
-    industry_code = Column(Integer)
-    rank = Column(Integer)
-    company = Column(String)
-    source_country = Column(String)
-    capital_investment = Column(Float)
-
-
-class JordanRegionTopFDI(Base):
-
-    __tablename__ = "region_top_fdi"
-    __table_args__ = (
-        PrimaryKeyConstraint("industry_code", "rank"),
-        {"schema": "jordan"},
-    )
-
-    industry_code = Column(Integer)
-    rank = Column(Integer)
-    company = Column(String)
-    source_country = Column(String)
-    capital_investment = Column(Float)
-
-
 class JordanFactors(Base):
 
     __tablename__ = "factors"
@@ -213,10 +183,6 @@ class JordanIndustry(Base):
         "JordanFactors",
         primaryjoin=(industry_code == foreign(JordanFactors.industry_code)),
     )
-    global_top_fdi = relationship(
-        "JordanGlobalTopFDI",
-        primaryjoin=(industry_code == foreign(JordanGlobalTopFDI.industry_code)),
-    )
     map_location = relationship(
         "JordanMapLocation",
         primaryjoin=(industry_code == foreign(JordanMapLocation.industry_code)),
@@ -232,10 +198,6 @@ class JordanIndustry(Base):
     over_time = relationship(
         "JordanOverTime",
         primaryjoin=(industry_code == foreign(JordanOverTime.industry_code)),
-    )
-    region_top_fdi = relationship(
-        "JordanRegionTopFDI",
-        primaryjoin=(industry_code == foreign(JordanRegionTopFDI.industry_code)),
     )
     schooling = relationship(
         "JordanSchooling",
