@@ -13,13 +13,6 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship, foreign
 
 
-# class AlbaniaAuth(Base):
-
-#     __tablename__ = "auth"
-
-#     key = Column(String, primary_key=True)
-
-
 class AlbaniaCountry(Base):
 
     __tablename__ = "country"
@@ -38,53 +31,6 @@ class AlbaniaCountry(Base):
     reported_serv = Column(Boolean(create_constraint=False), nullable=True)
     reported_serv_recent = Column(Boolean(create_constraint=False), nullable=True)
     former_country = Column(Boolean(create_constraint=False), nullable=True)
-
-
-class AlbaniaFDIMarkets(Base):
-
-    __tablename__ = "fdi_markets"
-    __table_args__ = (
-        PrimaryKeyConstraint(
-            "nace_id", "parent_company", "source_city", "source_country"
-        ),
-        {"schema": "albania"},
-    )
-
-    nace_id = Column(Integer)
-    location_id = Column(Integer)
-    parent_company = Column(String)
-    source_country = Column(String)
-    source_city = Column(String)
-    capex_world = Column(Float)
-    capex_europe = Column(Float)
-    capex_balkans = Column(Float)
-    projects_world = Column(Integer)
-    projects_europe = Column(Integer)
-    projects_balkans = Column(Integer)
-    avg_capex = Column(Float)
-    avg_jobs = Column(Float)
-    country = relationship(
-        "AlbaniaCountry",
-        primaryjoin=(location_id == foreign(AlbaniaCountry.location_id)),
-    )
-
-
-class AlbaniaFDIMarketsOvertime(Base):
-
-    __tablename__ = "fdi_markets_overtime"
-    __table_args__ = (
-        PrimaryKeyConstraint("nace_id", "destination"),
-        {"schema": "albania"},
-    )
-
-    nace_id = Column(Integer)
-    destination = Column(
-        Enum(*["Balkans", "Rest of Europe", "Rest of World"], name="destination")
-    )
-    projects_03_06 = Column(Integer)
-    projects_07_10 = Column(Integer)
-    projects_11_14 = Column(Integer)
-    projects_15_18 = Column(Integer)
 
 
 class AlbaniaFactors(Base):
@@ -229,13 +175,6 @@ class AlbaniaNACEIndustry(Base):
     code = Column(String)
     name = Column(String)
     parent_id = Column(Integer)
-    fdi_markets = relationship(
-        "AlbaniaFDIMarkets", primaryjoin=(nace_id == foreign(AlbaniaFDIMarkets.nace_id))
-    )
-    fdi_markets_overtime = relationship(
-        "AlbaniaFDIMarketsOvertime",
-        primaryjoin=(nace_id == foreign(AlbaniaFDIMarketsOvertime.nace_id)),
-    )
     factors = relationship(
         "AlbaniaFactors", primaryjoin=(nace_id == foreign(AlbaniaFactors.nace_id))
     )
