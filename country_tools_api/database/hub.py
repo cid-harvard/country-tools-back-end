@@ -4,6 +4,7 @@ from sqlalchemy import Column, Integer, String, Boolean, Enum, ARRAY, UniqueCons
 project_categories = Enum(
     *[
         "atlas_projects",
+        "annual_best_of",
         "country_dashboards",
         "visual_stories",
         "prototypes_experiments",

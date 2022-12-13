@@ -46,7 +46,7 @@ def format_enum(string):
     if string is np.NaN:
         return np.NaN
     else:
-        return string.lower().replace(" / ", "_").replace(" ", "_")
+        return string.lower().replace("-", "_").replace(" / ", "_").replace(" ", "_")
 
 
 if __name__ == "__main__":
