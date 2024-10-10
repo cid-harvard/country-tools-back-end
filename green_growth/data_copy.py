@@ -1,41 +1,51 @@
 import pandas as pd
+import os
 from sqlalchemy import MetaData, event
 from sqlalchemy.schema import CreateSchema
 from pandas_to_postgres import DataFrameCopy
 from country_tools_api.database.base import engine, Base
-from country_tools_api.database.namibia import (
-    NamibiaHSClassification,
-    NamibiaNAICSClassification,
+from country_tools_api.database.green_growth import (
+    # CountryProductYearSupplyChain,
+    CountryProductYear,
+    SupplyChainProductMember,
+    SupplyChain,
+    LocationCountry,
+    Product,
 )
+from green_growth.ingest import INGESTION_ATTRS
 
 
-NAM_SCHEMA = "namibia"
-NAM_PROCESSED_DATA_DIR = "./namibia/processed_data"
-NAM_TABLES = [
-    "hs_classification",
-    "hs_factors",
-    "hs_occupation",
-    "hs_proximity",
-    "hs_relative_demand",
-    "naics_classification",
-    "naics_factors",
-    "naics_occupation",
-    "naics_proximity",
-    "naics_relative_demand",
-    "threshold",
-]
+OUTPUT_DIR = os.path.join(INGESTION_ATTRS['output_dir'], INGESTION_ATTRS['last_updated'])
+DATA_MODELS = {
+    "green_growth" : ["country_product_year"], #"country_product_year_supply_chain",
+    "classification": ["supply_chain_product_member","supply_chain","location_country","product"],
+}
+    
+    
+def copy():
+    """
+    """
+    for schema, tables in DATA_MODELS.items():
+        engine.execute(f"CREATE SCHEMA IF NOT EXISTS green_growth;")
+        Base.metadata.create_all()
+        
+
+        with engine.connect() as c:
+            meta = MetaData(bind=c, reflect=True, schema=schema)
+            
+        print("****************************************")
+        print(f"Data Directory: {OUTPUT_DIR}")
+        print(f"Database Connection: {engine}")
+        print("****************************************")
+        
+        for table in tables:
+            DataFrameCopy(
+                pd.read_parquet(os.path.join(OUTPUT_DIR, schema, f"{table}.parquet")),
+                conn=c,
+                table_obj=meta.tables[f"green_growth.{table}"],
+            ).copy()
 
 
 if __name__ == "__main__":
-    engine.execute(f"CREATE SCHEMA IF NOT EXISTS {NAM_SCHEMA};")
-    Base.metadata.create_all()
-
-    with engine.connect() as c:
-        meta = MetaData(bind=c, reflect=True, schema=NAM_SCHEMA)
-
-        for table in NAM_TABLES:
-            DataFrameCopy(
-                pd.read_csv(f"{NAM_PROCESSED_DATA_DIR}/{table}.csv"),
-                conn=c,
-                table_obj=meta.tables[f"{NAM_SCHEMA}.{table}"],
-            ).copy()
+    copy()
+    

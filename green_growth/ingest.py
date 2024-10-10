@@ -7,7 +7,17 @@ pd.options.display.max_rows = None
 pd.set_option("max_colwidth", 400)
 
 logging.basicConfig(level=logging.INFO)
-from table_objects.base import Ingestion
+from green_growth.table_objects.base import Ingestion
+
+
+INGESTION_ATTRS = {
+        "input_dir": "/n/hausmann_lab/lab/_shared_dev_data/green_growth/input/2024_10_08/",
+        "output_dir": "/n/hausmann_lab/lab/_shared_dev_data/green_growth/output/",
+        "last_updated": "2024_10_08",
+        "product_classification": "hs12",
+        "product_level": 4,
+        
+    }
 
 
 def run(ingestion_attrs):
@@ -74,12 +84,4 @@ def run(ingestion_attrs):
     
     
 if __name__ == "__main__":
-    ingestion_attrs = {
-        "input_dir": "/n/hausmann_lab/lab/_shared_dev_data/green_growth/input/2024_10_08/",
-        "output_dir": "/n/hausmann_lab/lab/_shared_dev_data/green_growth/output/",
-        "last_updated": "2024_10_08",
-        "product_classification": "hs12",
-        "product_level": 4,
-        
-    }
     run(ingestion_attrs)
