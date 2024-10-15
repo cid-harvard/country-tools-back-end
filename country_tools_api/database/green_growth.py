@@ -46,8 +46,8 @@ class GGCountryProductYear(Base):
     product_ranking = Column(Integer)
     export_value = Column(Float)
     expected_exports = Column(Float)
-    # feasibility = Column(Float)
-    # attractiveness = Column(Float)
+    feasibility = Column(Float)
+    attractiveness = Column(Float)
 
 
 class GGSupplyChain(Base):
@@ -110,19 +110,3 @@ class GGProduct(Base):
         "GGSupplyChainProductMember",
         primaryjoin=(product_id == foreign(GGSupplyChainProductMember.product_id)),
     )
-
-
-# class CountryProductYearSupplyChain(Base):
-#     __tablename__ = 'country_product_year_supply_chain'
-#     __table_args__ = (
-#         PrimaryKeyConstraint("country_id", "product_id", "supply_chain_id", "year"),
-#         {"schema": "green_growth"},
-#     )
-
-#     year = Column(Integer)
-#     country_id = Column(Integer, ForeignKey('location_country.country_id'))
-#     product_id = Column(Integer, ForeignKey('product.product_id'))
-#     supply_chain_id = Column(Integer, ForeignKey('supply_chain.supply_chain_id'))
-#     export_rca = Column(Float)
-#     feasibility = Column(Float)
-#     attractiveness = Column(Float)

@@ -14,9 +14,11 @@ class Ingestion(object):
                 ):
         
         self.input_dir = input_dir
+        # self.classifications_dir = os.path.join(input_dir, "classifications")
         self.product_classification = product_classification
         self.product_level = product_level 
         self.output_dir = os.path.join(output_dir, last_updated)
+        self.last_updated = last_updated
                 
         os.makedirs(self.output_dir, exist_ok=True)
 
