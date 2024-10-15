@@ -8,52 +8,62 @@ from database import green_growth as green_growth_db
 from .util import sqlalchemy_filter
 
 
-class SupplyChainProductMember(SQLAlchemyObjectType):
+class GGSupplyChainProductMember(SQLAlchemyObjectType):
     class Meta:
-        model = green_growth_db.SupplyChainProductMember
+        model = green_growth_db.GGSupplyChainProductMember
         interfaces = (graphene.relay.Node,)
 
 
-class CountryProductYear(SQLAlchemyObjectType):
+class GGCountryProductYear(SQLAlchemyObjectType):
     class Meta:
-        model = green_growth_db.CountryProductYear
+        model = green_growth_db.GGCountryProductYear
         interfaces = (graphene.relay.Node,)
 
 
-class SupplyChain(SQLAlchemyObjectType):
+class GGSupplyChain(SQLAlchemyObjectType):
     class Meta:
-        model = green_growth_db.SupplyChain
+        model = green_growth_db.GGSupplyChain
         interfaces = (graphene.relay.Node,)
 
 
-class LocationCountry(SQLAlchemyObjectType):
+class GGLocationCountry(SQLAlchemyObjectType):
     class Meta:
-        model = green_growth_db.LocationCountry
+        model = green_growth_db.GGLocationCountry
         interfaces = (graphene.relay.Node,)
 
 
-class Product(SQLAlchemyObjectType):
+class GGProduct(SQLAlchemyObjectType):
     class Meta:
-        model = green_growth_db.Product
+        model = green_growth_db.GGProduct
         interfaces = (graphene.relay.Node,)
 
 
 class GreenGrowthQuery(graphene.ObjectType):
-    gg_product_list = graphene.List(Product)
-    gg_country_list = graphene.List(LocationCountry)
-    gg_supply_chain_list = graphene.List(SupplyChain)
-    gg_supply_chain_product_member_list = graphene.List(SupplyChainProductMember)
-    gg_cpy_list = graphene.List(CountryProductYear)
-    
+    gg_product_list = graphene.List(GGProduct)
+    gg_location_country_list = graphene.List(GGLocationCountry)
+    gg_supply_chain_list = graphene.List(GGSupplyChain)
+    gg_supply_chain_product_member_list = graphene.List(GGSupplyChainProductMember)
+    gg_cpy_list = graphene.List(
+        GGCountryProductYear,
+        year=graphene.Int(required=True),
+        country_id=graphene.Int(required=True),
+    )
 
-    def resolve_gg_cpy_list(self, info, **args):
-        q = db_session.query(green_growth_db.CountryProductYear)
-
+    def resolve_gg_cpy_list(self, info, year, country_id):
         return (
-            db_session.query(green_growth_db.CountryProductYear)
-            .filter(
-                getattr(green_growth_db.CountryProductYear, "year") == args["year"]
-            )
-            .filter(getattr(green_growth_db.CountryProductYear, "country_id") == args["country_id"]
-                   )
+            db_session.query(green_growth_db.GGCountryProductYear)
+            .filter(green_growth_db.GGCountryProductYear.year == year)
+            .filter(green_growth_db.GGCountryProductYear.country_id == country_id)
         )
+
+    def resolve_gg_product_list(self, info, **args):
+        return db_session.query(green_growth_db.GGProduct)
+
+    def resolve_gg_location_country_list(self, info, **args):
+        return db_session.query(green_growth_db.GGLocationCountry)
+
+    def resolve_gg_supply_chain_list(self, info, **args):
+        return db_session.query(green_growth_db.GGSupplyChain)
+
+    def resolve_gg_supply_chain_product_member_list(self, info, **args):
+        return db_session.query(green_growth_db.GGSupplyChainProductMember)

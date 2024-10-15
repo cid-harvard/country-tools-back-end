@@ -14,25 +14,33 @@ from sqlalchemy import (
 from sqlalchemy.orm import relation, relationship, foreign
 
 
-class SupplyChainProductMember(Base):
-    __tablename__ = 'supply_chain_product_member'
+class GGSupplyChainProductMember(Base):
+    __tablename__ = "supply_chain_product_member"
     __table_args__ = (
         PrimaryKeyConstraint("supply_chain_id", "product_id"),
         {"schema": "green_growth"},
     )
-    supply_chain_id = Column(Integer, primary_key=True)#, ForeignKey('SupplyChain.supply_chain_id'))
-    product_id = Column(Integer, primary_key=True)#, ForeignKey('Product.product_id'))
+    supply_chain_id = Column(
+        Integer, primary_key=True
+    )  # , ForeignKey('SupplyChain.supply_chain_id'))
+    product_id = Column(
+        Integer, primary_key=True
+    )  # , ForeignKey('Product.product_id'))
 
-    
-class CountryProductYear(Base):
-    __tablename__ = 'country_product_year'
+
+class GGCountryProductYear(Base):
+    __tablename__ = "country_product_year"
     __table_args__ = (
         PrimaryKeyConstraint("country_id", "product_id", "year"),
         {"schema": "green_growth"},
     )
     year = Column(Integer, primary_key=True)
-    country_id = Column(Integer, primary_key=True)#, ForeignKey('location_country.country_id'))
-    product_id = Column(Integer, primary_key=True)#, ForeignKey('product.product_id'))
+    country_id = Column(
+        Integer, primary_key=True
+    )  # , ForeignKey('location_country.country_id'))
+    product_id = Column(
+        Integer, primary_key=True
+    )  # , ForeignKey('product.product_id'))
     export_rca = Column(Float)
     normalized_export_rca = Column(Float)
     product_ranking = Column(Integer)
@@ -42,18 +50,21 @@ class CountryProductYear(Base):
     # attractiveness = Column(Float)
 
 
-
-class SupplyChain(Base):
-    __tablename__ = 'supply_chain'
+class GGSupplyChain(Base):
+    __tablename__ = "supply_chain"
     __table_args__ = ({"schema": "green_growth"},)
     supply_chain_id = Column(Integer, primary_key=True)
     supply_chain = Column(String, primary_key=True)
     member_supply_chain = relationship(
-        "SupplyChainProductMember", primaryjoin=(supply_chain_id == foreign(SupplyChainProductMember.supply_chain_id))
+        "GGSupplyChainProductMember",
+        primaryjoin=(
+            supply_chain_id == foreign(GGSupplyChainProductMember.supply_chain_id)
+        ),
     )
 
-class LocationCountry(Base):
-    __tablename__ = 'location_country'
+
+class GGLocationCountry(Base):
+    __tablename__ = "location_country"
     __table_args__ = ({"schema": "green_growth"},)
 
     country_id = Column(Integer, primary_key=True)
@@ -73,13 +84,13 @@ class LocationCountry(Base):
     incomelevel_enum = Column(Text)
     country_project = Column(Boolean)
     country = relationship(
-        "CountryProductYear", primaryjoin=(country_id == foreign(CountryProductYear.country_id))
+        "GGCountryProductYear",
+        primaryjoin=(country_id == foreign(GGCountryProductYear.country_id)),
     )
 
 
-
-class Product(Base):
-    __tablename__ = 'product'
+class GGProduct(Base):
+    __tablename__ = "product"
     __table_args__ = ({"schema": "green_growth"},)
 
     product_id = Column(Integer, primary_key=True)
@@ -92,11 +103,14 @@ class Product(Base):
     top_parent_id = Column(Integer)
     show_feasibility = Column(Boolean)
     product = relationship(
-        "CountryProductYear", primaryjoin=(product_id == foreign(CountryProductYear.product_id))
+        "GGCountryProductYear",
+        primaryjoin=(product_id == foreign(GGCountryProductYear.product_id)),
     )
     member_product = relationship(
-        "SupplyChainProductMember", primaryjoin=(product_id == foreign(SupplyChainProductMember.product_id))
+        "GGSupplyChainProductMember",
+        primaryjoin=(product_id == foreign(GGSupplyChainProductMember.product_id)),
     )
+
 
 # class CountryProductYearSupplyChain(Base):
 #     __tablename__ = 'country_product_year_supply_chain'
@@ -112,7 +126,3 @@ class Product(Base):
 #     export_rca = Column(Float)
 #     feasibility = Column(Float)
 #     attractiveness = Column(Float)
-
-
-
-
