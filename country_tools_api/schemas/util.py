@@ -1,4 +1,4 @@
-from database.base import db_session
+from country_tools_api.database.base import db_session
 
 
 def sqlalchemy_filter(args, model, col):

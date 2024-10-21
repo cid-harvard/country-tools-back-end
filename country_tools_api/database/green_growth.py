@@ -11,18 +11,16 @@ from sqlalchemy import (
     PrimaryKeyConstraint,
     ForeignKeyConstraint,
 )
-from sqlalchemy.orm import relation, relationship, foreign
+
+# from sqlalchemy.orm import relation, relationship, foreign
+from sqlalchemy.orm import relationship, foreign
 
 
 class GGSupplyChainProductMember(Base):
     __tablename__ = "supply_chain_product_member"
-    __table_args__ = (
-        PrimaryKeyConstraint("supply_chain_id", "product_id"),
-        {"schema": "green_growth"},
-    )
-    supply_chain_id = Column(
-        Integer, primary_key=True
-    )  # , ForeignKey('SupplyChain.supply_chain_id'))
+    __table_args__ = {"schema": "green_growth_copy"}
+
+    supply_chain_id = Column(Integer, primary_key=True)
     product_id = Column(
         Integer, primary_key=True
     )  # , ForeignKey('Product.product_id'))
@@ -30,17 +28,11 @@ class GGSupplyChainProductMember(Base):
 
 class GGCountryProductYear(Base):
     __tablename__ = "country_product_year"
-    __table_args__ = (
-        PrimaryKeyConstraint("country_id", "product_id", "year"),
-        {"schema": "green_growth"},
-    )
+    __table_args__ = {"schema": "green_growth_copy"}
+
     year = Column(Integer, primary_key=True)
-    country_id = Column(
-        Integer, primary_key=True
-    )  
-    product_id = Column(
-        Integer, primary_key=True
-    ) 
+    country_id = Column(Integer, primary_key=True)
+    product_id = Column(Integer, primary_key=True)
     export_rca = Column(Float)
     normalized_export_rca = Column(Float)
     product_ranking = Column(Integer)
@@ -54,12 +46,12 @@ class GGCountryProductYear(Base):
     normalized_pci = Column(Float)
     effective_number_of_exporters = Column(Float)
     market_growth = Column(Float)
-    
 
 
 class GGSupplyChain(Base):
     __tablename__ = "supply_chain"
-    __table_args__ = ({"schema": "green_growth"},)
+    __table_args__ = {"schema": "green_growth_copy"}
+
     supply_chain_id = Column(Integer, primary_key=True)
     supply_chain = Column(String, primary_key=True)
     member_supply_chain = relationship(
@@ -72,10 +64,9 @@ class GGSupplyChain(Base):
 
 class GGLocationCountry(Base):
     __tablename__ = "location_country"
-    __table_args__ = ({"schema": "green_growth"},)
+    __table_args__ = {"schema": "green_growth_copy"}
 
     country_id = Column(Integer, primary_key=True)
-    # location_level = Column(String(50))
     name_en = Column(String(100))
     name_short_en = Column(String(50))
     name_es = Column(String(100))
@@ -83,6 +74,7 @@ class GGLocationCountry(Base):
     iso3_code = Column(String(3))
     iso2_code = Column(String(2))
     legacy_location_id = Column(Integer)
+    parent_id = Column(Integer)
     name_abbr_en = Column(String(50))
     the_prefix = Column(Boolean)
     former_country = Column(Boolean)
@@ -98,7 +90,7 @@ class GGLocationCountry(Base):
 
 class GGProduct(Base):
     __tablename__ = "product"
-    __table_args__ = ({"schema": "green_growth"},)
+    __table_args__ = {"schema": "green_growth_copy"}
 
     product_id = Column(Integer, primary_key=True)
     code = Column(String(6))

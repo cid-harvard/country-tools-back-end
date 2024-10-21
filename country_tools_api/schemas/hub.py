@@ -4,8 +4,8 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy import func
 from collections import Counter
 
-from database.base import db_session
-from database import hub as hub_db
+from country_tools_api.database.base import db_session
+from country_tools_api.database import hub as hub_db
 
 
 class HubProjects(SQLAlchemyObjectType):
@@ -54,4 +54,3 @@ class HubQuery(graphene.ObjectType):
             keywords.append(HubKeywords(key, count))
 
         return keywords
-

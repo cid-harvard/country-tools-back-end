@@ -1,10 +1,10 @@
 import graphene
 
-from .albania import AlbaniaQuery
-from .jordan import JordanQuery
-from .namibia import NamibiaQuery
-from .hub import HubQuery
-from .green_growth import GreenGrowthQuery
+from country_tools_api.schemas.albania import AlbaniaQuery
+from country_tools_api.schemas.jordan import JordanQuery
+from country_tools_api.schemas.namibia import NamibiaQuery
+from country_tools_api.schemas.hub import HubQuery
+from country_tools_api.schemas.green_growth import GreenGrowthQuery
 
 
 class Query(AlbaniaQuery, JordanQuery, NamibiaQuery, HubQuery, GreenGrowthQuery):

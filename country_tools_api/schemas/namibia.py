@@ -2,10 +2,10 @@ import graphene
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from database.base import db_session
-from database import namibia as namibia_db
+from country_tools_api.database.base import db_session
+from country_tools_api.database import namibia as namibia_db
 
-from .util import sqlalchemy_filter
+from country_tools_api.schemas.util import sqlalchemy_filter
 
 
 class NamibiaHSClassification(SQLAlchemyObjectType):
