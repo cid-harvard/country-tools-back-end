@@ -15,10 +15,9 @@ from green_growth.table_objects.base import Ingestion
 INGESTION_ATTRS = {
         "input_dir": "/n/hausmann_lab/lab/_shared_dev_data/green_growth/input/",
         "output_dir": "/n/hausmann_lab/lab/_shared_dev_data/green_growth/output/",
-        "last_updated": "2024_10_14",
+        "last_updated": "2024_10_18",
         "product_classification": "hs12",
-        "product_level": 4,
-        
+        "product_level": 4,   
     }
 
 
@@ -34,6 +33,9 @@ def run(ingestion_attrs):
     
     # location country classification
     country = GreenGrowth.load_parquet("location_country", "classifications")
+    country = country[(country.in_cp==True) & (country.location_level=="country")]
+    country = country[['country_id', 'name_en', 'name_short_en', 'name_es', 
+                       'name_short_es', 'iso3_code', 'iso2_code', 'parent_id']]
     
     # product hs12 classification
     # TODO does our product name, match gg product name
@@ -50,27 +52,42 @@ def run(ingestion_attrs):
 
     
     # hexbin not supply chain specific
-    hexbin = hexbin.merge(country[['country_id', 'name_short_en']], left_on=['country_name'], right_on=['name_short_en'], how="left").merge(prod[['product_id', 'code']], left_on="HS2012", right_on="code", how="left")
-        
+    hexbin = hexbin.merge(country[['country_id', 'name_short_en']], left_on=['country_name'], right_on=['name_short_en'], how="inner").merge(prod[['product_id', 'code']], left_on="HS2012", right_on="code", how="inner")
+    
     hexbin = hexbin[["year", "country_id", "product_id", "export_rca", "normalized_export_rca", "product_ranking"]]    
     hexbin = hexbin.drop_duplicates(subset=['year', 'country_id', 'product_id'])
     
-    # country product year
-    # year | country_id | product_id | export_value | expected_exports | export_rca | feasibility | attractiveness
-    # normalized_export_rca | product_ranking
+    green_products = hexbin.product_id.unique()
+    prod = prod[prod.product_id.isin(green_products)]
         
-    bar_graph = GreenGrowth.load_parquet("2_expected_actual", GreenGrowth.last_updated).merge(country[['country_id', 'iso3_code']], on=['iso3_code'], how="left").merge(prod[['product_id', 'code']], left_on="HS2012", right_on="code", how="left")
+    # country product year
+    # year | country_id | product_id | export_value | expected_exports | export_rca | feasibility | 
+    # attractiveness | normalized_export_rca | product_ranking
+        
+    bar_graph = GreenGrowth.load_parquet("2_expected_actual", GreenGrowth.last_updated).merge(country[['country_id', 'iso3_code']], on=['iso3_code'], how="inner").merge(prod[['product_id', 'code']], left_on="HS2012", right_on="code", how="inner")
     bar_graph = bar_graph[["year", "country_id", "product_id", "export_value", "expected_exports"]]
     bar_graph = bar_graph.drop_duplicates(subset=['year', 'country_id', 'product_id'])
     
     # scatterplot
-    scatterplot = GreenGrowth.load_parquet("3_scatterplot_input", GreenGrowth.last_updated).merge(country[['country_id', 'iso3_code']], on=['iso3_code'], how="left").merge(prod[['product_id', 'code']], left_on="HS2012", right_on="code", how="left").merge(supply_chain, on=["supply_chain"], how="left").rename(columns={"id":"supply_chain_id"})
+    scatterplot = GreenGrowth.load_parquet("3_scatterplot_input", GreenGrowth.last_updated).merge(country[['country_id', 'iso3_code']], on=['iso3_code'], how="inner").merge(prod[['product_id', 'code']], left_on="HS2012", right_on="code", how="inner").merge(supply_chain, on=["supply_chain"], how="left").rename(columns={"id":"supply_chain_id"})
     
-    scatterplot = scatterplot[["year", "country_id", "product_id", "supply_chain_id", "feasibility", "attractiveness"]]
+    scatterplot = scatterplot[["year", "country_id", "product_id", "feasibility", "attractiveness"]]
     scatterplot = scatterplot.drop_duplicates(subset=['year', 'country_id', 'product_id'])
     
-    cpy = hexbin.merge(bar_graph, on=["year", "country_id", "product_id"], how="left").merge(scatterplot, on=["year", "country_id", "product_id"], how="left")
-        
+    cpy = hexbin.merge(bar_graph, on=["year", "country_id", "product_id"], how="outer").merge(scatterplot, on=["year", "country_id", "product_id"], how="outer")
+    
+    # handle spider metrics
+    spiders = GreenGrowth.load_parquet("4_spiders", GreenGrowth.last_updated)
+    spiders = spiders.drop_duplicates()
+    spiders = spiders.merge(country[['country_id', 'name_short_en']], left_on=['country_name'], right_on=['name_short_en'], how="inner").merge(prod[['product_id', 'code']], left_on="HS2012", right_on="code", how="inner")
+    
+    spiders = spiders[["year", "country_id", "product_id", "global_market_share", "normalized_cog",
+                     "density", "normalized_pci", "effective_number_of_exporters", "market_growth"]]
+    
+    spiders = spiders.drop_duplicates(subset=["year", "country_id", "product_id"])
+
+    cpy = cpy.merge(spiders, on=["year", "country_id", "product_id"], how="outer")    
+    
     # save GreenGrowth data to output directory
     # classifications
     GreenGrowth.save_parquet(supply_chain, "supply_chain")

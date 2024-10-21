@@ -37,10 +37,10 @@ class GGCountryProductYear(Base):
     year = Column(Integer, primary_key=True)
     country_id = Column(
         Integer, primary_key=True
-    )  # , ForeignKey('location_country.country_id'))
+    )  
     product_id = Column(
         Integer, primary_key=True
-    )  # , ForeignKey('product.product_id'))
+    ) 
     export_rca = Column(Float)
     normalized_export_rca = Column(Float)
     product_ranking = Column(Integer)
@@ -48,6 +48,13 @@ class GGCountryProductYear(Base):
     expected_exports = Column(Float)
     feasibility = Column(Float)
     attractiveness = Column(Float)
+    global_market_share = Column(Float)
+    normalized_cog = Column(Float)
+    density = Column(Float)
+    normalized_pci = Column(Float)
+    effective_number_of_exporters = Column(Float)
+    market_growth = Column(Float)
+    
 
 
 class GGSupplyChain(Base):
