@@ -20,6 +20,12 @@ class GGCountryProductYear(SQLAlchemyObjectType):
         interfaces = (graphene.relay.Node,)
 
 
+class GGCountryProductYearSupplyChain(SQLAlchemyObjectType):
+    class Meta:
+        model = green_growth_db.GGCountryProductYearSupplyChain
+        interfaces = (graphene.relay.Node,)
+
+
 class GGSupplyChain(SQLAlchemyObjectType):
     class Meta:
         model = green_growth_db.GGSupplyChain
@@ -48,12 +54,26 @@ class GreenGrowthQuery(graphene.ObjectType):
         year=graphene.Int(required=True),
         country_id=graphene.Int(required=True),
     )
+    gg_cpysc_list = graphene.List(
+        GGCountryProductYearSupplyChain,
+        year=graphene.Int(required=True),
+        country_id=graphene.Int(required=True),
+    )
 
     def resolve_gg_cpy_list(self, info, year, country_id):
         return (
             db_session.query(green_growth_db.GGCountryProductYear)
             .filter(green_growth_db.GGCountryProductYear.year == year)
             .filter(green_growth_db.GGCountryProductYear.country_id == country_id)
+        )
+
+    def resolve_gg_cpysc_list(self, info, year, country_id):
+        return (
+            db_session.query(green_growth_db.GGCountryProductYearSupplyChain)
+            .filter(green_growth_db.GGCountryProductYearSupplyChain.year == year)
+            .filter(
+                green_growth_db.GGCountryProductYearSupplyChain.country_id == country_id
+            )
         )
 
     def resolve_gg_product_list(self, info, **args):

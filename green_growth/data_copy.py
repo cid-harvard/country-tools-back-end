@@ -21,12 +21,13 @@ OUTPUT_DIR = os.path.join(
 )
 DATA_MODELS = [
     "country_product_year",
+    "country_product_year_supply_chain",
     "supply_chain_product_member",
     "supply_chain",
     "location_country",
     "product",
 ]
-SCHEMA = "green_growth_copy"
+SCHEMA = "green_growth"
 
 
 def copy():

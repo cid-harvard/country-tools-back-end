@@ -18,7 +18,7 @@ from sqlalchemy.orm import relationship, foreign
 
 class GGSupplyChainProductMember(Base):
     __tablename__ = "supply_chain_product_member"
-    __table_args__ = {"schema": "green_growth_copy"}
+    __table_args__ = {"schema": "green_growth"}
 
     supply_chain_id = Column(Integer, primary_key=True)
     product_id = Column(
@@ -28,14 +28,13 @@ class GGSupplyChainProductMember(Base):
 
 class GGCountryProductYear(Base):
     __tablename__ = "country_product_year"
-    __table_args__ = {"schema": "green_growth_copy"}
+    __table_args__ = {"schema": "green_growth"}
 
     year = Column(Integer, primary_key=True)
     country_id = Column(Integer, primary_key=True)
     product_id = Column(Integer, primary_key=True)
     export_rca = Column(Float)
     normalized_export_rca = Column(Float)
-    product_ranking = Column(Integer)
     export_value = Column(Float)
     expected_exports = Column(Float)
     feasibility = Column(Float)
@@ -46,11 +45,23 @@ class GGCountryProductYear(Base):
     normalized_pci = Column(Float)
     effective_number_of_exporters = Column(Float)
     market_growth = Column(Float)
+    product_ranking = Column(Integer)
+
+
+class GGCountryProductYearSupplyChain(Base):
+    __tablename__ = "country_product_year_supply_chain"
+    __table_args__ = {"schema": "green_growth"}
+
+    year = Column(Integer, primary_key=True)
+    country_id = Column(Integer, primary_key=True)
+    product_id = Column(Integer, primary_key=True)
+    supply_chain_id = Column(Integer, primary_key=True)
+    product_ranking = Column(Integer)
 
 
 class GGSupplyChain(Base):
     __tablename__ = "supply_chain"
-    __table_args__ = {"schema": "green_growth_copy"}
+    __table_args__ = {"schema": "green_growth"}
 
     supply_chain_id = Column(Integer, primary_key=True)
     supply_chain = Column(String, primary_key=True)
@@ -64,7 +75,7 @@ class GGSupplyChain(Base):
 
 class GGLocationCountry(Base):
     __tablename__ = "location_country"
-    __table_args__ = {"schema": "green_growth_copy"}
+    __table_args__ = {"schema": "green_growth"}
 
     country_id = Column(Integer, primary_key=True)
     name_en = Column(String(100))
@@ -90,7 +101,7 @@ class GGLocationCountry(Base):
 
 class GGProduct(Base):
     __tablename__ = "product"
-    __table_args__ = {"schema": "green_growth_copy"}
+    __table_args__ = {"schema": "green_growth"}
 
     product_id = Column(Integer, primary_key=True)
     code = Column(String(6))

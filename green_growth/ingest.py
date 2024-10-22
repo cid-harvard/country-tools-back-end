@@ -2,6 +2,7 @@ import logging
 import os
 import pandas as pd
 import sys
+import numpy as np
 
 pd.options.display.max_columns = None
 pd.options.display.max_rows = None
@@ -80,26 +81,36 @@ def run(ingestion_attrs):
     ).drop(columns=["supply_chain", "code", "HS2012"])
 
     # hexbin not supply chain specific
-    hexbin = hexbin.merge(
-        country[["country_id", "name_short_en"]],
-        left_on=["country_name"],
-        right_on=["name_short_en"],
-        how="inner",
-    ).merge(
-        prod[["product_id", "code"]], left_on="HS2012", right_on="code", how="inner"
+    hexbin = (
+        hexbin.merge(
+            country[["country_id", "name_short_en"]],
+            left_on=["country_name"],
+            right_on=["name_short_en"],
+            how="inner",
+        )
+        .merge(
+            prod[["product_id", "code"]], left_on="HS2012", right_on="code", how="inner"
+        )
+        .merge(supply_chain, on=["supply_chain"], how="left")
     )
 
-    hexbin = hexbin[
+    cpy = hexbin.drop_duplicates(subset=["year", "country_id", "product_id"])
+    cpy = cpy[
         [
             "year",
             "country_id",
             "product_id",
             "export_rca",
             "normalized_export_rca",
-            "product_ranking",
         ]
     ]
-    hexbin = hexbin.drop_duplicates(subset=["year", "country_id", "product_id"])
+
+    cpysc = hexbin.drop_duplicates(
+        subset=["year", "country_id", "product_id", "supply_chain_id"]
+    )
+    cpysc = cpysc[
+        ["year", "country_id", "product_id", "supply_chain_id", "product_ranking"]
+    ]
 
     green_products = hexbin.product_id.unique()
     prod = prod[prod.product_id.isin(green_products)]
@@ -119,6 +130,8 @@ def run(ingestion_attrs):
         ["year", "country_id", "product_id", "export_value", "expected_exports"]
     ]
     bar_graph = bar_graph.drop_duplicates(subset=["year", "country_id", "product_id"])
+    bar_graph["expected_exports"] = np.exp(bar_graph["expected_exports"])
+    bar_graph["export_value"] = np.exp(bar_graph["export_value"])
 
     # scatterplot
     scatterplot = (
@@ -138,7 +151,7 @@ def run(ingestion_attrs):
         subset=["year", "country_id", "product_id"]
     )
 
-    cpy = hexbin.merge(
+    cpy = cpy.merge(
         bar_graph, on=["year", "country_id", "product_id"], how="outer"
     ).merge(scatterplot, on=["year", "country_id", "product_id"], how="outer")
 
@@ -182,30 +195,31 @@ def run(ingestion_attrs):
     # Green Growth
     # GreenGrowth.save_parquet(cpy_sc, "country_product_year_supply_chain", "green_growth")
     GreenGrowth.save_parquet(cpy, "country_product_year")
+    GreenGrowth.save_parquet(cpysc, "country_product_year_supply_chain")
 
     # save GreenGrowth data to output directory
     # classifications
-    supply_chain.to_csv(
-        os.path.join(GreenGrowth.output_dir, "supply_chain.csv"), index=False
-    )
-    country.to_csv(
-        os.path.join(GreenGrowth.output_dir, "location_country.csv"), index=False
-    )
-    prod.to_csv(
-        os.path.join(
-            GreenGrowth.output_dir, f"product_{GreenGrowth.product_classification}.csv"
-        ),
-        index=False,
-    )
-    supply_chain_product_member.to_csv(
-        os.path.join(GreenGrowth.output_dir, "supply_chain_product_member.csv"),
-        index=False,
-    )
+    # supply_chain.to_csv(
+    #     os.path.join(GreenGrowth.output_dir, "supply_chain.csv"), index=False
+    # )
+    # country.to_csv(
+    #     os.path.join(GreenGrowth.output_dir, "location_country.csv"), index=False
+    # )
+    # prod.to_csv(
+    #     os.path.join(
+    #         GreenGrowth.output_dir, f"product_{GreenGrowth.product_classification}.csv"
+    #     ),
+    #     index=False,
+    # )
+    # supply_chain_product_member.to_csv(
+    #     os.path.join(GreenGrowth.output_dir, "supply_chain_product_member.csv"),
+    #     index=False,
+    # )
 
-    # Green Growth
-    cpy.to_csv(
-        os.path.join(GreenGrowth.output_dir, "country_product_year.csv"), index=False
-    )
+    # # Green Growth
+    # cpy.to_csv(
+    #     os.path.join(GreenGrowth.output_dir, "country_product_year.csv"), index=False
+    # )
 
 
 if __name__ == "__main__":
