@@ -19,6 +19,7 @@ flask-graphql = "2.0.1"
 gunicorn = "^23.0.0"
 pandas-to-postgres = { git = "https://github.com/cid-harvard/pandas-to-postgres.git", branch = "rewrite-updates" }
 werkzeug = "0.16.1"
+markupsafe = "2.0.1"
 
 
 
