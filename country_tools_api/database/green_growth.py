@@ -35,15 +35,12 @@ class GGCountryProductYear(Base):
         {"schema": "green_growth"},
     )
     year = Column(Integer, primary_key=True)
-    country_id = Column(
-        Integer, primary_key=True
-    )  
-    product_id = Column(
-        Integer, primary_key=True
-    ) 
+    country_id = Column(Integer, primary_key=True)
+    product_id = Column(Integer, primary_key=True)
     export_rca = Column(Float)
     normalized_export_rca = Column(Float)
-    product_ranking = Column(Integer)
+    logtf_export_value = Column(Float)
+    logtf_expected_exports = Column(Float)
     export_value = Column(Float)
     expected_exports = Column(Float)
     feasibility = Column(Float)
@@ -54,7 +51,7 @@ class GGCountryProductYear(Base):
     normalized_pci = Column(Float)
     effective_number_of_exporters = Column(Float)
     market_growth = Column(Float)
-    
+    product_ranking = Column(Integer)
 
 
 class GGSupplyChain(Base):
@@ -68,6 +65,16 @@ class GGSupplyChain(Base):
             supply_chain_id == foreign(GGSupplyChainProductMember.supply_chain_id)
         ),
     )
+
+
+class GGCountryProductYearSupplyChain(Base):
+    __tablename__ = "country_product_year_supply_chain"
+    __table_args__ = {"schema": "green_growth"}
+    year = Column(Integer, primary_key=True)
+    country_id = Column(Integer, primary_key=True)
+    product_id = Column(Integer, primary_key=True)
+    supply_chain_id = Column(Integer, primary_key=True)
+    product_ranking = Column(Integer)
 
 
 class GGLocationCountry(Base):
