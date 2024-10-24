@@ -4,9 +4,9 @@ from sqlalchemy import MetaData, event, text, INTEGER, exc
 from sqlalchemy.schema import CreateSchema
 from pandas_to_postgres import DataFrameCopy, ParquetCopy, cast_pandas
 
-from country_tools_api.database.base import engine, Base
+from country_tools.country_tools_api.database.base import engine, Base
 
-from country_tools_api.database.green_growth import (
+from country_tools.country_tools_api.database.green_growth import (
     GGCountryProductYear,
     GGSupplyChainProductMember,
     GGSupplyChain,
