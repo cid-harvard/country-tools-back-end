@@ -1,75 +1,74 @@
 import graphene
-
-# from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
+from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 from country_tools.country_tools_api.database.base import db_session
 from country_tools.country_tools_api.database import namibia as namibia_db
 
-from country_tools.country_tools_api.schemas.util import sqlalchemy_filter
+from .util import sqlalchemy_filter
 
 
-class NamibiaHSClassification(graphene.ObjectType):
+class NamibiaHSClassification(SQLAlchemyObjectType):
     class Meta:
         model = namibia_db.NamibiaHSClassification
         interfaces = (graphene.relay.Node,)
 
 
-class NamibiaNAICSClassification(graphene.ObjectType):
+class NamibiaNAICSClassification(SQLAlchemyObjectType):
     class Meta:
         model = namibia_db.NamibiaNAICSClassification
         interfaces = (graphene.relay.Node,)
 
 
-class NamibiaHSFactors(graphene.ObjectType):
+class NamibiaHSFactors(SQLAlchemyObjectType):
     class Meta:
         model = namibia_db.NamibiaHSFactors
         interfaces = (graphene.relay.Node,)
 
 
-class NamibiaNAICSFactors(graphene.ObjectType):
+class NamibiaNAICSFactors(SQLAlchemyObjectType):
     class Meta:
         model = namibia_db.NamibiaNAICSFactors
         interfaces = (graphene.relay.Node,)
 
 
-class NamibiaHSProximity(graphene.ObjectType):
+class NamibiaHSProximity(SQLAlchemyObjectType):
     class Meta:
         model = namibia_db.NamibiaHSProximity
         interfaces = (graphene.relay.Node,)
 
 
-class NamibiaNAICSProximity(graphene.ObjectType):
+class NamibiaNAICSProximity(SQLAlchemyObjectType):
     class Meta:
         model = namibia_db.NamibiaNAICSProximity
         interfaces = (graphene.relay.Node,)
 
 
-class NamibiaHSRelativeDemand(graphene.ObjectType):
+class NamibiaHSRelativeDemand(SQLAlchemyObjectType):
     class Meta:
         model = namibia_db.NamibiaHSRelativeDemand
         interfaces = (graphene.relay.Node,)
 
 
-class NamibiaNAICSRelativeDemand(graphene.ObjectType):
+class NamibiaNAICSRelativeDemand(SQLAlchemyObjectType):
     class Meta:
         model = namibia_db.NamibiaNAICSRelativeDemand
         interfaces = (graphene.relay.Node,)
 
 
-class NamibiaHSOccupation(graphene.ObjectType):
+class NamibiaHSOccupation(SQLAlchemyObjectType):
     class Meta:
         model = namibia_db.NamibiaHSOccupation
         interfaces = (graphene.relay.Node,)
 
 
-class NamibiaNAICSOccupation(graphene.ObjectType):
+class NamibiaNAICSOccupation(SQLAlchemyObjectType):
     class Meta:
         model = namibia_db.NamibiaNAICSOccupation
         interfaces = (graphene.relay.Node,)
 
 
-class NamibiaThreshold(graphene.ObjectType):
+class NamibiaThreshold(SQLAlchemyObjectType):
     class Meta:
         model = namibia_db.NamibiaThreshold
         interfaces = (graphene.relay.Node,)

@@ -1,6 +1,5 @@
 import graphene
-
-# from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
+from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 from country_tools.country_tools_api.database.base import db_session
@@ -13,21 +12,21 @@ from .util import sqlalchemy_filter
 
 
 # NACE Industry
-class AlbaniaNACEIndustry(graphene.ObjectType):
+class AlbaniaNACEIndustry(SQLAlchemyObjectType):
     class Meta:
         model = albania_db.AlbaniaNACEIndustry
         interfaces = (graphene.relay.Node,)
 
 
 # Country
-class AlbaniaCountry(graphene.ObjectType):
+class AlbaniaCountry(SQLAlchemyObjectType):
     class Meta:
         model = albania_db.AlbaniaCountry
         interfaces = (graphene.relay.Node,)
 
 
 # Viability
-class AlbaniaFactors(graphene.ObjectType):
+class AlbaniaFactors(SQLAlchemyObjectType):
     class Meta:
         model = albania_db.AlbaniaFactors
         interfaces = (graphene.relay.Node,)
@@ -37,42 +36,42 @@ class AlbaniaFactors(graphene.ObjectType):
 
 
 # Script
-class AlbaniaScript(graphene.ObjectType):
+class AlbaniaScript(SQLAlchemyObjectType):
     class Meta:
         model = albania_db.AlbaniaScript
         interfaces = (graphene.relay.Node,)
 
 
 # Industry Now Location
-class AlbaniaIndustryNowLocation(graphene.ObjectType):
+class AlbaniaIndustryNowLocation(SQLAlchemyObjectType):
     class Meta:
         model = albania_db.AlbaniaIndustryNowLocation
         interfaces = (graphene.relay.Node,)
 
 
 # Industry Now Schooling
-class AlbaniaIndustryNowSchooling(graphene.ObjectType):
+class AlbaniaIndustryNowSchooling(SQLAlchemyObjectType):
     class Meta:
         model = albania_db.AlbaniaIndustryNowSchooling
         interfaces = (graphene.relay.Node,)
 
 
 # Industry Now Occupation
-class AlbaniaIndustryNowOccupation(graphene.ObjectType):
+class AlbaniaIndustryNowOccupation(SQLAlchemyObjectType):
     class Meta:
         model = albania_db.AlbaniaIndustryNowOccupation
         interfaces = (graphene.relay.Node,)
 
 
 # Industry Now Wage
-class AlbaniaIndustryNowWage(graphene.ObjectType):
+class AlbaniaIndustryNowWage(SQLAlchemyObjectType):
     class Meta:
         model = albania_db.AlbaniaIndustryNowWage
         interfaces = (graphene.relay.Node,)
 
 
 # Industry Now Nearest Industry
-class AlbaniaIndustryNowNearestIndustry(graphene.ObjectType):
+class AlbaniaIndustryNowNearestIndustry(SQLAlchemyObjectType):
     class Meta:
         model = albania_db.AlbaniaIndustryNowNearestIndustry
         interfaces = (graphene.relay.Node,)
