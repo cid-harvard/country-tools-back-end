@@ -8,7 +8,6 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-flask = "1.1.4"
 psycopg2-binary = "^2.9.10"
 sqlalchemy = "2.0.22"
 flask-sqlalchemy = "2.5.1"
@@ -18,8 +17,11 @@ graphene = "2.1.9"
 flask-graphql = "2.0.1"
 gunicorn = "^23.0.0"
 pandas-to-postgres = { git = "https://github.com/cid-harvard/pandas-to-postgres.git", branch = "rewrite-updates" }
+flask = "1.1.4"
+itsdangerous = "1.1.0"
 werkzeug = "0.16.1"
-markupsafe = "2.0.1"
+jinja2 = "2.11.3"
+markupsafe = "1.1.1"
 
 
 
