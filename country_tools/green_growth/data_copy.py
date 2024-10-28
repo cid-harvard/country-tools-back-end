@@ -13,7 +13,7 @@ from country_tools.country_tools_api.database.green_growth import (
     GGLocationCountry,
     GGProduct,
 )
-from green_growth.ingest import INGESTION_ATTRS
+from country_tools.green_growth.ingest import INGESTION_ATTRS
 
 
 OUTPUT_DIR = os.path.join(
@@ -39,7 +39,7 @@ def copy():
 
     with engine.connect() as conn:
         conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA};"))
-        conn.commit()
+        # conn.commit()
 
     Base.metadata.create_all(bind=engine)
 

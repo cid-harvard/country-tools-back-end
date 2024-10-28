@@ -12,9 +12,6 @@ from sqlalchemy import (
     ForeignKeyConstraint,
 )
 
-# from sqlalchemy.orm import relation, relationship, foreign
-# from sqlalchemy.orm import relationship, foreign
-
 
 class GGSupplyChainProductMember(Base):
     __tablename__ = "supply_chain_product_member"
@@ -35,6 +32,8 @@ class GGCountryProductYear(Base):
     normalized_export_rca = Column(Float)
     export_value = Column(Float)
     expected_exports = Column(Float)
+    logtf_export_value = Column(Float)
+    logtf_expected_exports = Column(Float)
     feasibility = Column(Float)
     attractiveness = Column(Float)
     global_market_share = Column(Float)

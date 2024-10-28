@@ -21,7 +21,7 @@ from green_growth.table_objects.base import Ingestion
 INGESTION_ATTRS = {
     "input_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/data_downloads/green_growth",
     "output_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/data_downloads/green_growth/output",
-    "last_updated": "2024_10_18",
+    "last_updated": "2024_10_22",
     "product_classification": "hs12",
     "product_level": 4,
 }
@@ -126,12 +126,19 @@ def run(ingestion_attrs):
             prod[["product_id", "code"]], left_on="HS2012", right_on="code", how="inner"
         )
     )
+
     bar_graph = bar_graph[
-        ["year", "country_id", "product_id", "export_value", "expected_exports"]
+        [
+            "year",
+            "country_id",
+            "product_id",
+            "export_value",
+            "expected_exports",
+            "logtf_expected_exports",
+            "logtf_export_value",
+        ]
     ]
     bar_graph = bar_graph.drop_duplicates(subset=["year", "country_id", "product_id"])
-    bar_graph["expected_exports"] = np.exp(bar_graph["expected_exports"])
-    bar_graph["export_value"] = np.exp(bar_graph["export_value"])
 
     # scatterplot
     scatterplot = (
@@ -177,11 +184,12 @@ def run(ingestion_attrs):
             "density",
             "normalized_pci",
             "effective_number_of_exporters",
-            "market_growth",
+            "product_market_share_growth",
         ]
     ]
 
     spiders = spiders.drop_duplicates(subset=["year", "country_id", "product_id"])
+    spiders = spiders.rename(columns={"product_market_share_growth": "market_growth"})
 
     cpy = cpy.merge(spiders, on=["year", "country_id", "product_id"], how="outer")
 
@@ -189,11 +197,10 @@ def run(ingestion_attrs):
     # classifications
     GreenGrowth.save_parquet(supply_chain, "supply_chain")
     GreenGrowth.save_parquet(country, "location_country")
-    GreenGrowth.save_parquet(prod, f"product_{GreenGrowth.product_classification}")
+    GreenGrowth.save_parquet(prod, f"product")
     GreenGrowth.save_parquet(supply_chain_product_member, "supply_chain_product_member")
 
     # Green Growth
-    # GreenGrowth.save_parquet(cpy_sc, "country_product_year_supply_chain", "green_growth")
     GreenGrowth.save_parquet(cpy, "country_product_year")
     GreenGrowth.save_parquet(cpysc, "country_product_year_supply_chain")
 
