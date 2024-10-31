@@ -21,7 +21,7 @@ from green_growth.table_objects.base import Ingestion
 INGESTION_ATTRS = {
     "input_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/data_downloads/green_growth",
     "output_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/data_downloads/green_growth/output",
-    "last_updated": "2024_10_22",
+    "last_updated": "2024_10_31",
     "product_classification": "hs12",
     "product_level": 4,
 }
@@ -32,12 +32,25 @@ def run(ingestion_attrs):
     GreenGrowth = Ingestion(**ingestion_attrs)
 
     hexbin = GreenGrowth.load_parquet("1_hexbin_input", GreenGrowth.last_updated)
+    hexbin.loc[
+        hexbin.supply_chain == "Fuel Cells And Green Hydrogen", "supply_chain"
+    ] = "Green Hydrogen"
+    hexbin.loc[
+        hexbin.supply_chain == "Critical Metals and Minerals", "supply_chain"
+    ] = "Critical Minerals"
 
     # supply chain classification
     supply_chain = (
         hexbin["supply_chain"].drop_duplicates().reset_index(drop=True).reset_index()
     )
     supply_chain = supply_chain.rename(columns={"index": "supply_chain_id"})
+
+    supply_chain.loc[
+        supply_chain.supply_chain == "Fuel Cells And Green Hydrogen", "supply_chain"
+    ] = "Green Hydrogen"
+    supply_chain.loc[
+        supply_chain.supply_chain == "Critical Metals and Minerals", "supply_chain"
+    ] = "Critical Minerals"
 
     # location country classification
     country = GreenGrowth.load_parquet("location_country", "classifications")
@@ -134,8 +147,6 @@ def run(ingestion_attrs):
             "product_id",
             "export_value",
             "expected_exports",
-            "logtf_expected_exports",
-            "logtf_export_value",
         ]
     ]
     bar_graph = bar_graph.drop_duplicates(subset=["year", "country_id", "product_id"])
