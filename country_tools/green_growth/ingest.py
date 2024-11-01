@@ -21,7 +21,7 @@ from green_growth.table_objects.base import Ingestion
 INGESTION_ATTRS = {
     "input_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/data_downloads/green_growth",
     "output_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/data_downloads/green_growth/output",
-    "last_updated": "2024_10_31",
+    "last_updated": "2024_11_01",
     "product_classification": "hs12",
     "product_level": 4,
 }
@@ -191,9 +191,8 @@ def run(ingestion_attrs):
             "country_id",
             "product_id",
             "global_market_share",
-            "normalized_cog",
+            "cog_pci",
             "density",
-            "normalized_pci",
             "effective_number_of_exporters",
             "product_market_share_growth",
         ]
@@ -217,27 +216,25 @@ def run(ingestion_attrs):
 
     # save GreenGrowth data to output directory
     # classifications
-    # supply_chain.to_csv(
-    #     os.path.join(GreenGrowth.output_dir, "supply_chain.csv"), index=False
-    # )
-    # country.to_csv(
-    #     os.path.join(GreenGrowth.output_dir, "location_country.csv"), index=False
-    # )
-    # prod.to_csv(
-    #     os.path.join(
-    #         GreenGrowth.output_dir, f"product_{GreenGrowth.product_classification}.csv"
-    #     ),
-    #     index=False,
-    # )
-    # supply_chain_product_member.to_csv(
-    #     os.path.join(GreenGrowth.output_dir, "supply_chain_product_member.csv"),
-    #     index=False,
-    # )
+    supply_chain.to_csv(
+        os.path.join(GreenGrowth.output_dir, "supply_chain.csv"), index=False
+    )
+    country.to_csv(
+        os.path.join(GreenGrowth.output_dir, "location_country.csv"), index=False
+    )
+    prod.to_csv(
+        os.path.join(GreenGrowth.output_dir, f"product.csv"),
+        index=False,
+    )
+    supply_chain_product_member.to_csv(
+        os.path.join(GreenGrowth.output_dir, "supply_chain_product_member.csv"),
+        index=False,
+    )
 
-    # # Green Growth
-    # cpy.to_csv(
-    #     os.path.join(GreenGrowth.output_dir, "country_product_year.csv"), index=False
-    # )
+    # Green Growth
+    cpy.to_csv(
+        os.path.join(GreenGrowth.output_dir, "country_product_year.csv"), index=False
+    )
 
 
 if __name__ == "__main__":
