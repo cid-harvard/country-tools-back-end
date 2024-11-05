@@ -89,6 +89,8 @@ class GGCountryProductYear(Base):
     logtf_expected_exports = Column(Float)
     feasibility = Column(Float)
     cog_pci = Column(Float)
+    normalized_pci = Column(Float)
+    normalized_cog = Column(Float)
     global_market_share = Column(Float)
     attractiveness = Column(Float)
     density = Column(Float)
