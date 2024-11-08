@@ -60,10 +60,7 @@ class GGSupplyChainProductMember(Base):
     __tablename__ = "supply_chain_product_member"
     __table_args__ = {"schema": "green_growth"}
     supply_chain_id = Column(Integer, primary_key=True)
-    #     Integer, ForeignKey(GGSupplyChain.supply_chain_id), primary_key=True
-    # )
     product_id = Column(Integer, ForeignKey(GGProduct.product_id), primary_key=True)
-
     supply_chain = relationship(
         "GGSupplyChain",
         primaryjoin=(supply_chain_id == foreign(GGSupplyChain.supply_chain_id)),
@@ -84,14 +81,12 @@ class GGCountryProductYear(Base):
     normalized_export_rca = Column(Float)
     export_value = Column(Float)
     expected_exports = Column(Float)
-    # spider metrics (5)
-    normalized_pci = Column(Float)
+    normalized_pci = Column(Float)  # spider metrics (5)
     normalized_cog = Column(Float)
     feasibility = Column(Float)
     effective_number_of_exporters = Column(Float)
     market_growth = Column(Float)
-    # standardized values are for the scatterplot visualization
-    pci_std = Column(Float)
+    pci_std = Column(Float)  # standardized values are for the scatterplot visualization
     cog_std = Column(Float)
     feasibility_std = Column(Float)
     pci_cog_feasibility_composite = Column(Float)
