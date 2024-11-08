@@ -80,23 +80,21 @@ class GGCountryProductYear(Base):
     year = Column(Integer, primary_key=True)
     country_id = Column(Integer, primary_key=True)
     product_id = Column(Integer, primary_key=True)
-    # ForeignKey(GGProduct.product_id), primary_key=True)
     export_rca = Column(Float)
     normalized_export_rca = Column(Float)
     export_value = Column(Float)
     expected_exports = Column(Float)
-    logtf_export_value = Column(Float)
-    logtf_expected_exports = Column(Float)
-    feasibility = Column(Float)
-    cog_pci = Column(Float)
+    # spider metrics (5)
     normalized_pci = Column(Float)
     normalized_cog = Column(Float)
-    global_market_share = Column(Float)
-    attractiveness = Column(Float)
-    density = Column(Float)
+    feasibility = Column(Float)
     effective_number_of_exporters = Column(Float)
     market_growth = Column(Float)
-    product_ranking = Column(Integer)
+    # standardized values are for the scatterplot visualization
+    pci_std = Column(Float)
+    cog_std = Column(Float)
+    feasibility_std = Column(Float)
+    pci_cog_feasibility_composite = Column(Float)
     location = relationship(
         "GGLocationCountry",
         primaryjoin=(country_id == foreign(GGLocationCountry.country_id)),
@@ -112,8 +110,6 @@ class GGCountryProductYearSupplyChain(Base):
     __table_args__ = {"schema": "green_growth"}
     year = Column(Integer, primary_key=True)
     country_id = Column(Integer, primary_key=True)
-    #     Integer, ForeignKey(GGLocationCountry.country_id), primary_key=True
-    # )
     product_id = Column(Integer, ForeignKey(GGProduct.product_id), primary_key=True)
     supply_chain_id = Column(Integer, primary_key=True)
     product_ranking = Column(Integer)

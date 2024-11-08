@@ -21,7 +21,7 @@ from green_growth.table_objects.base import Ingestion
 INGESTION_ATTRS = {
     "input_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/data_downloads/green_growth",
     "output_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/data_downloads/green_growth/output",
-    "last_updated": "2024_11_01",
+    "last_updated": "2024_11_06",
     "product_classification": "hs12",
     "product_level": 4,
 }
@@ -162,11 +162,24 @@ def run(ingestion_attrs):
         .rename(columns={"id": "supply_chain_id"})
     )
 
+    # from raw data files these are duplicate values ["export_rca"]
     scatterplot = scatterplot[
-        ["year", "country_id", "product_id", "feasibility", "attractiveness"]
+        [
+            "year",
+            "country_id",
+            "product_id",
+            "pci_std",
+            "cog_std",
+            "feasibility_std",
+            "balanced_portfolio",
+        ]
     ]
     scatterplot = scatterplot.drop_duplicates(
         subset=["year", "country_id", "product_id"]
+    )
+
+    scatterplot = scatterplot.rename(
+        columns={"balanced_portfolio": "pci_cog_feasibility_composite"}
     )
 
     cpy = cpy.merge(
@@ -190,8 +203,8 @@ def run(ingestion_attrs):
             "year",
             "country_id",
             "product_id",
-            "global_market_share",
-            "cog_pci",
+            "normalized_cog",
+            "normalized_pci",
             "density",
             "effective_number_of_exporters",
             "product_market_share_growth",
@@ -199,7 +212,12 @@ def run(ingestion_attrs):
     ]
 
     spiders = spiders.drop_duplicates(subset=["year", "country_id", "product_id"])
-    spiders = spiders.rename(columns={"product_market_share_growth": "market_growth"})
+    spiders = spiders.rename(
+        columns={
+            "product_market_share_growth": "market_growth",
+            "density": "feasibility",
+        }
+    )
 
     cpy = cpy.merge(spiders, on=["year", "country_id", "product_id"], how="outer")
 
