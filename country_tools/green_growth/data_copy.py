@@ -40,7 +40,7 @@ def copy():
 
     with engine.connect() as conn:
         conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA};"))
-        # conn.commit()
+        conn.commit()
 
     # Base.metadata.clear()
     Base.metadata.create_all(bind=engine)

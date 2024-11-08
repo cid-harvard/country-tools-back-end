@@ -24,15 +24,15 @@ class GGCountryProductYear(graphene.ObjectType):
     normalized_export_rca = graphene.Float()
     export_value = graphene.Float()
     expected_exports = graphene.Float()
-    feasibility = graphene.Float()
-    attractiveness = graphene.Float()
-    global_market_share = graphene.Float()
-    normalized_cog = graphene.Float()
-    density = graphene.Float()
     normalized_pci = graphene.Float()
+    normalized_cog = graphene.Float()
+    feasibility = graphene.Float()
     effective_number_of_exporters = graphene.Float()
     market_growth = graphene.Float()
-    product_ranking = graphene.Int()
+    pci_std = graphene.Float()
+    cog_std = graphene.Float()
+    feasibility_std = graphene.Float()
+    pci_cog_feasibility_composite = graphene.Float()
 
 
 class GGCountryProductYearSupplyChain(graphene.ObjectType):
