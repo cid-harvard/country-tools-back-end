@@ -14,10 +14,10 @@ from sqlalchemy import (
 from sqlalchemy.orm import relation, relationship, foreign
 
 
-class GGSupplyChainProductMember(Base):
-    __tablename__ = "supply_chain_product_member"
+class GGSupplyChainClusterProductMember(Base):
+    __tablename__ = "supply_chain_cluster_product_member"
     __table_args__ = (
-        PrimaryKeyConstraint("supply_chain_id", "product_id"),
+        PrimaryKeyConstraint("supply_chain_id", "cluster_id", "product_id"),
         {"schema": "green_growth"},
     )
     supply_chain_id = Column(
@@ -26,7 +26,9 @@ class GGSupplyChainProductMember(Base):
     product_id = Column(
         Integer, primary_key=True
     )  # , ForeignKey('Product.product_id'))
-
+    cluster_id = Column(
+        Integer, primary_key=True
+    )
 
 class GGCountryProductYear(Base):
     __tablename__ = "country_product_year"
@@ -54,8 +56,31 @@ class GGCountryProductYear(Base):
     normalized_pci = Column(Float)
     effective_number_of_exporters = Column(Float)
     market_growth = Column(Float)
-    
 
+
+class GGCountry(Base):
+    __tablename__ = "country"
+    __table_args__ = (
+        PrimaryKeyConstraint("country_id"),
+        {"schema": "green_growth"},
+    )
+    coi_green = Column(Float)
+    lntotnetnrexp_pc = Column(Float)
+    lnypc = Column(Float)
+    x_resid = Column(Float)
+    
+class GGClusterCountry(Base):
+    __tablename__ = "cluster_country"
+    __table_args__ = (
+        PrimaryKeyConstraint("cluster_id", "country_id"),
+        {"schema": "green_growth"},
+    )
+    cluster_id = Column(Integer, primary_key=True)
+    country_id = Column(Integer, primary_key=True)
+    pci = Column(Float)
+    cog = Column(Float)
+    density = Column(Float)
+    rca = Column(Float)
 
 class GGSupplyChain(Base):
     __tablename__ = "supply_chain"
@@ -69,7 +94,26 @@ class GGSupplyChain(Base):
         ),
     )
 
+class GGCluster(Base):
+    __tablename__ = "cluster"
+    __table_args__ = ({"schema": "green_growth"},)
+    cluster_id = Column(Integer, primary_key=True)
+    cluster_name = Column(String)
+    member_cluster = relationship(
+        "GGSupplyChainClusterProductMember",
+        primaryjoin=(cluster_id == foreign(GGSupplyChainClusterProductMember.cluster_id)),
+    )
 
+class GGLocationRegion(Base):
+    __tablename__ = "location_region"
+    __table_args__ = ({"schema": "green_growth"},)
+    region_id = Column(Integer, primary_key=True)
+    name = Column(String)
+    region_code = Column(String)
+    member_region = relationship(
+        "GGSupplyChainClusterProductMember",
+        primaryjoin=(region_id == foreign(GGSupplyChainClusterProductMember.region_id)),
+    )
 class GGLocationCountry(Base):
     __tablename__ = "location_country"
     __table_args__ = ({"schema": "green_growth"},)
