@@ -21,7 +21,7 @@ from green_growth.table_objects.base import Ingestion
 INGESTION_ATTRS = {
     "input_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/data_downloads/green_growth",
     "output_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/data_downloads/green_growth/output",
-    "last_updated": "2024_10_18",
+    "last_updated": "2024_11_06",
     "product_classification": "hs12",
     "product_level": 4,
 }
@@ -32,12 +32,25 @@ def run(ingestion_attrs):
     GreenGrowth = Ingestion(**ingestion_attrs)
 
     hexbin = GreenGrowth.load_parquet("1_hexbin_input", GreenGrowth.last_updated)
+    hexbin.loc[
+        hexbin.supply_chain == "Fuel Cells And Green Hydrogen", "supply_chain"
+    ] = "Green Hydrogen"
+    hexbin.loc[
+        hexbin.supply_chain == "Critical Metals and Minerals", "supply_chain"
+    ] = "Critical Minerals"
 
     # supply chain classification
     supply_chain = (
         hexbin["supply_chain"].drop_duplicates().reset_index(drop=True).reset_index()
     )
     supply_chain = supply_chain.rename(columns={"index": "supply_chain_id"})
+
+    supply_chain.loc[
+        supply_chain.supply_chain == "Fuel Cells And Green Hydrogen", "supply_chain"
+    ] = "Green Hydrogen"
+    supply_chain.loc[
+        supply_chain.supply_chain == "Critical Metals and Minerals", "supply_chain"
+    ] = "Critical Minerals"
 
     # location country classification
     country = GreenGrowth.load_parquet("location_country", "classifications")
@@ -126,12 +139,17 @@ def run(ingestion_attrs):
             prod[["product_id", "code"]], left_on="HS2012", right_on="code", how="inner"
         )
     )
+
     bar_graph = bar_graph[
-        ["year", "country_id", "product_id", "export_value", "expected_exports"]
+        [
+            "year",
+            "country_id",
+            "product_id",
+            "export_value",
+            "expected_exports",
+        ]
     ]
     bar_graph = bar_graph.drop_duplicates(subset=["year", "country_id", "product_id"])
-    bar_graph["expected_exports"] = np.exp(bar_graph["expected_exports"])
-    bar_graph["export_value"] = np.exp(bar_graph["export_value"])
 
     # scatterplot
     scatterplot = (
@@ -144,11 +162,24 @@ def run(ingestion_attrs):
         .rename(columns={"id": "supply_chain_id"})
     )
 
+    # from raw data files these are duplicate values ["export_rca"]
     scatterplot = scatterplot[
-        ["year", "country_id", "product_id", "feasibility", "attractiveness"]
+        [
+            "year",
+            "country_id",
+            "product_id",
+            "pci_std",
+            "cog_std",
+            "feasibility_std",
+            "balanced_portfolio",
+        ]
     ]
     scatterplot = scatterplot.drop_duplicates(
         subset=["year", "country_id", "product_id"]
+    )
+
+    scatterplot = scatterplot.rename(
+        columns={"balanced_portfolio": "pci_cog_feasibility_composite"}
     )
 
     cpy = cpy.merge(
@@ -172,16 +203,21 @@ def run(ingestion_attrs):
             "year",
             "country_id",
             "product_id",
-            "global_market_share",
             "normalized_cog",
-            "density",
             "normalized_pci",
+            "density",
             "effective_number_of_exporters",
-            "market_growth",
+            "product_market_share_growth",
         ]
     ]
 
     spiders = spiders.drop_duplicates(subset=["year", "country_id", "product_id"])
+    spiders = spiders.rename(
+        columns={
+            "product_market_share_growth": "market_growth",
+            "density": "feasibility",
+        }
+    )
 
     cpy = cpy.merge(spiders, on=["year", "country_id", "product_id"], how="outer")
 
@@ -189,37 +225,34 @@ def run(ingestion_attrs):
     # classifications
     GreenGrowth.save_parquet(supply_chain, "supply_chain")
     GreenGrowth.save_parquet(country, "location_country")
-    GreenGrowth.save_parquet(prod, f"product_{GreenGrowth.product_classification}")
+    GreenGrowth.save_parquet(prod, f"product")
     GreenGrowth.save_parquet(supply_chain_product_member, "supply_chain_product_member")
 
     # Green Growth
-    # GreenGrowth.save_parquet(cpy_sc, "country_product_year_supply_chain", "green_growth")
     GreenGrowth.save_parquet(cpy, "country_product_year")
     GreenGrowth.save_parquet(cpysc, "country_product_year_supply_chain")
 
     # save GreenGrowth data to output directory
     # classifications
-    # supply_chain.to_csv(
-    #     os.path.join(GreenGrowth.output_dir, "supply_chain.csv"), index=False
-    # )
-    # country.to_csv(
-    #     os.path.join(GreenGrowth.output_dir, "location_country.csv"), index=False
-    # )
-    # prod.to_csv(
-    #     os.path.join(
-    #         GreenGrowth.output_dir, f"product_{GreenGrowth.product_classification}.csv"
-    #     ),
-    #     index=False,
-    # )
-    # supply_chain_product_member.to_csv(
-    #     os.path.join(GreenGrowth.output_dir, "supply_chain_product_member.csv"),
-    #     index=False,
-    # )
+    supply_chain.to_csv(
+        os.path.join(GreenGrowth.output_dir, "supply_chain.csv"), index=False
+    )
+    country.to_csv(
+        os.path.join(GreenGrowth.output_dir, "location_country.csv"), index=False
+    )
+    prod.to_csv(
+        os.path.join(GreenGrowth.output_dir, f"product.csv"),
+        index=False,
+    )
+    supply_chain_product_member.to_csv(
+        os.path.join(GreenGrowth.output_dir, "supply_chain_product_member.csv"),
+        index=False,
+    )
 
-    # # Green Growth
-    # cpy.to_csv(
-    #     os.path.join(GreenGrowth.output_dir, "country_product_year.csv"), index=False
-    # )
+    # Green Growth
+    cpy.to_csv(
+        os.path.join(GreenGrowth.output_dir, "country_product_year.csv"), index=False
+    )
 
 
 if __name__ == "__main__":

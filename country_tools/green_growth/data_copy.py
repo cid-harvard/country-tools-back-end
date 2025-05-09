@@ -8,12 +8,13 @@ from country_tools.country_tools_api.database.base import engine, Base
 
 from country_tools.country_tools_api.database.green_growth import (
     GGCountryProductYear,
+    GGCountryProductYearSupplyChain,
     GGSupplyChainProductMember,
     GGSupplyChain,
     GGLocationCountry,
     GGProduct,
 )
-from green_growth.ingest import INGESTION_ATTRS
+from country_tools.green_growth.ingest import INGESTION_ATTRS
 
 
 OUTPUT_DIR = os.path.join(
@@ -41,6 +42,7 @@ def copy():
         conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA};"))
         conn.commit()
 
+    # Base.metadata.clear()
     Base.metadata.create_all(bind=engine)
 
     with engine.connect() as conn:

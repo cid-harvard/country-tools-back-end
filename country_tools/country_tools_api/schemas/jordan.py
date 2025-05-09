@@ -1,72 +1,70 @@
 import graphene
-
-# from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
+from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 from country_tools.country_tools_api.database.base import db_session
 from country_tools.country_tools_api.database import (
-    albania as albania_db,
     jordan as jordan_db,
 )
 
-from country_tools.country_tools_api.schemas.util import sqlalchemy_filter
+from .util import sqlalchemy_filter
 
 
-class JordanIndustry(graphene.ObjectType):
+class JordanIndustry(SQLAlchemyObjectType):
     class Meta:
         model = jordan_db.JordanIndustry
         interfaces = (graphene.relay.Node,)
 
 
-class JordanNationality(graphene.ObjectType):
+class JordanNationality(SQLAlchemyObjectType):
     class Meta:
         model = jordan_db.JordanNationality
         interfaces = (graphene.relay.Node,)
 
 
-class JordanControl(graphene.ObjectType):
+class JordanControl(SQLAlchemyObjectType):
     class Meta:
         model = jordan_db.JordanControl
         interfaces = (graphene.relay.Node,)
 
 
-class JordanText(graphene.ObjectType):
+class JordanText(SQLAlchemyObjectType):
     class Meta:
         model = jordan_db.JordanText
         interfaces = (graphene.relay.Node,)
 
 
-class JordanOccupation(graphene.ObjectType):
+class JordanOccupation(SQLAlchemyObjectType):
     class Meta:
         model = jordan_db.JordanOccupation
         interfaces = (graphene.relay.Node,)
 
 
-class JordanSchooling(graphene.ObjectType):
+class JordanSchooling(SQLAlchemyObjectType):
     class Meta:
         model = jordan_db.JordanSchooling
         interfaces = (graphene.relay.Node,)
 
 
-class JordanWageHistogram(graphene.ObjectType):
+class JordanWageHistogram(SQLAlchemyObjectType):
     class Meta:
         model = jordan_db.JordanWageHistogram
         interfaces = (graphene.relay.Node,)
 
 
-class JordanMapLocation(graphene.ObjectType):
+class JordanMapLocation(SQLAlchemyObjectType):
     class Meta:
         model = jordan_db.JordanMapLocation
         interfaces = (graphene.relay.Node,)
 
 
-class JordanFactors(graphene.ObjectType):
+class JordanFactors(SQLAlchemyObjectType):
     class Meta:
         model = jordan_db.JordanFactors
         interfaces = (graphene.relay.Node,)
 
 
-class JordanOverTime(graphene.ObjectType):
+class JordanOverTime(SQLAlchemyObjectType):
     class Meta:
         model = jordan_db.JordanOverTime
         interfaces = (graphene.relay.Node,)
