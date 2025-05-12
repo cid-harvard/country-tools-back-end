@@ -1,4 +1,5 @@
 import graphene
+from graphene.relay import Node
 
 from sqlalchemy.orm import scoped_session, sessionmaker
 
@@ -9,6 +10,9 @@ from country_tools.country_tools_api.schemas.util import sqlalchemy_filter
 
 
 class GGSupplyChainClusterProductMember(graphene.ObjectType):
+    class Meta:
+        model = green_growth_db.GGSupplyChainClusterProductMember
+        interfaces = (Node,)
 
     supply_chain_id = graphene.Int()
     product_id = graphene.Int()
@@ -16,6 +20,9 @@ class GGSupplyChainClusterProductMember(graphene.ObjectType):
 
 
 class GGCountryProductYear(graphene.ObjectType):
+    class Meta:
+        model = green_growth_db.GGCountryProductYear
+        interfaces = (Node,)
 
     year = graphene.Int()
     country_id = graphene.Int()
@@ -37,6 +44,9 @@ class GGCountryProductYear(graphene.ObjectType):
 
 
 class GGCountryProductYearSupplyChain(graphene.ObjectType):
+    class Meta:
+        model = green_growth_db.GGCountryProductYearSupplyChain
+        interfaces = (Node,)
 
     year = graphene.Int()
     country_id = graphene.Int()
@@ -46,6 +56,9 @@ class GGCountryProductYearSupplyChain(graphene.ObjectType):
 
 
 class GGClusterCountry(graphene.ObjectType):
+    class Meta:
+        model = green_growth_db.GGClusterCountry
+        interfaces = (Node,)
 
     country_id = graphene.Int()
     cluster_id = graphene.Int()
@@ -56,18 +69,27 @@ class GGClusterCountry(graphene.ObjectType):
 
 
 class GGSupplyChain(graphene.ObjectType):
+    class Meta:
+        model = green_growth_db.GGSupplyChain
+        interfaces = (Node,)
 
     supply_chain_id = graphene.Int()
     supply_chain = graphene.String()
 
 
 class GGCluster(graphene.ObjectType):
+    class Meta:
+        model = green_growth_db.GGCluster
+        interfaces = (Node,)
 
     cluster_id = graphene.Int()
     cluster_name = graphene.String()
 
 
 class GGLocationRegion(graphene.ObjectType):
+    class Meta:
+        model = green_growth_db.GGLocationRegion
+        interfaces = (Node,)
 
     region_id = graphene.Int()
     name = graphene.String()
@@ -76,6 +98,9 @@ class GGLocationRegion(graphene.ObjectType):
 
 
 class GGLocationCountry(graphene.ObjectType):
+    class Meta:
+        model = green_growth_db.GGLocationCountry
+        interfaces = (Node,)
 
     country_id = graphene.Int()
     name_en = graphene.String()
@@ -96,6 +121,9 @@ class GGLocationCountry(graphene.ObjectType):
 
 
 class GGProduct(graphene.ObjectType):
+    class Meta:
+        model = green_growth_db.GGProduct
+        interfaces = (Node,)
 
     product_id = graphene.Int()
     code = graphene.String()
