@@ -12,8 +12,10 @@ from green_growth.table_objects.base import Ingestion
 
 
 INGESTION_ATTRS = {
-    "input_dir": "/n/hausmann_lab/lab/_shared_dev_data/green_growth/input/",
-    "output_dir": "/n/hausmann_lab/lab/_shared_dev_data/green_growth/output/",
+    # "input_dir": "/n/hausmann_lab/lab/_shared_dev_data/green_growth/input/",
+    # "output_dir": "/n/hausmann_lab/lab/ellie/green_growth/output/",
+    "input_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/green_growth/data/input/",
+    "output_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/green_growth/data/output/",
     "last_updated": "2025_04_30",
     "product_classification": "hs12",
     "product_level": 4,
@@ -37,7 +39,7 @@ def run(ingestion_attrs):
         .reset_index(drop=True)
         .reset_index()
     )
-    supply_chain = supply_chain.rename(columns={"index": "id"})
+    supply_chain = supply_chain.rename(columns={"index": "supply_chain_id"})
 
     # location country classification
     country = GreenGrowth.load_parquet("location_country", "classifications")
@@ -56,6 +58,10 @@ def run(ingestion_attrs):
     ]
 
     region = GreenGrowth.load_parquet("location_region", "classifications")
+    region = region.rename(columns={"id": "region_id", "regioncode": "region_code"})
+    region = region.drop(columns=["abbreviation"])
+    # TODO which region are being dropped?
+    region = region[~(region.region_id.isna())]
 
     # product hs12 classification
     # TODO does our product name, match gg product name
@@ -85,7 +91,7 @@ def run(ingestion_attrs):
     )
     sc_cluster_product = sc_cluster_product.rename(
         columns={"id": "supply_chain_id", "dominant_cluster": "cluster_id"}
-    )
+    ).drop(columns=["supply_chain"])
     sc_cluster_product.supply_chain_id = sc_cluster_product.supply_chain_id.astype(int)
 
     # scp = hexbin[['supply_chain','HS2012']].groupby(["supply_chain", "HS2012"]).agg("first").reset_index()
@@ -94,17 +100,33 @@ def run(ingestion_attrs):
     # scp = scp.rename(columns={"id":"supply_chain_id"}).drop(columns=["supply_chain", "code", "HS2012"])
 
     # hexbin not supply chain specific
-    hexbin = hexbin.merge(
-        country[["country_id", "name_short_en"]],
-        left_on=["country_name"],
-        right_on=["name_short_en"],
-        how="inner",
-    ).merge(
-        prod[["product_id", "code"]], left_on="HS2012", right_on="code", how="inner"
+    hexbin = (
+        hexbin.merge(
+            country[["country_id", "name_short_en"]],
+            left_on=["country_name"],
+            right_on=["name_short_en"],
+            how="inner",
+        )
+        .merge(
+            prod[["product_id", "code"]], left_on="HS2012", right_on="code", how="inner"
+        )
+        .merge(
+            supply_chain[["supply_chain_id", "supply_chain"]],
+            left_on="supply_chain",
+            right_on="supply_chain",
+            how="inner",
+        )
     )
-    hexbin = hexbin[
-        ["year", "country_id", "product_id", "normalized_export_rca", "product_ranking"]
+
+    cpysc = hexbin.copy()
+    cpysc = cpysc.drop_duplicates(
+        subset=["year", "country_id", "product_id", "supply_chain_id"]
+    )
+    cpysc = cpysc[
+        ["year", "country_id", "product_id", "supply_chain_id", "product_ranking"]
     ]
+
+    hexbin = hexbin[["year", "country_id", "product_id", "normalized_export_rca"]]
 
     green_products = hexbin.product_id.unique()
     prod = prod[prod.product_id.isin(green_products)]
@@ -157,7 +179,6 @@ def run(ingestion_attrs):
         "feasibility_std",
         "balanced_portfolio",
         "normalized_export_rca",
-        "product_ranking",
     ]
     cpy = bar_graph.merge(
         scatterplot, on=["year", "country_id", "product_id"], how="outer"
@@ -168,7 +189,6 @@ def run(ingestion_attrs):
                 "country_id",
                 "product_id",
                 "normalized_export_rca",
-                "product_ranking",
             ]
         ],
         on=["year", "country_id", "product_id"],
@@ -242,6 +262,7 @@ def run(ingestion_attrs):
     )
 
     cpy = cpy.merge(spiders, on=["year", "country_id", "product_id"], how="outer")
+    cpy = cpy.drop(columns=["supply_chain_id"])
 
     # cluster country metrics
     cluster_country = GreenGrowth.load_parquet(
@@ -284,12 +305,14 @@ def run(ingestion_attrs):
     # classifications
     GreenGrowth.save_parquet(supply_chain, "supply_chain")
     GreenGrowth.save_parquet(country, "location_country")
+    GreenGrowth.save_parquet(region, "location_region")
     GreenGrowth.save_parquet(prod, f"product_{GreenGrowth.product_classification}")
-    GreenGrowth.save_parquet(sc_cluster_product, "supply_chain_cluster_product_member")
     GreenGrowth.save_parquet(cluster, "cluster")
+    GreenGrowth.save_parquet(cluster_country, "cluster_country")
+    GreenGrowth.save_parquet(sc_cluster_product, "supply_chain_cluster_product_member")
 
     # Green Growth
-    # GreenGrowth.save_parquet(cpy_sc, "country_product_year_supply_chain", "green_growth")
+    GreenGrowth.save_parquet(cpysc, "country_product_year_supply_chain")
     GreenGrowth.save_parquet(cpy, "country_product_year")
 
     # save GreenGrowth data to output directory
@@ -322,9 +345,6 @@ def run(ingestion_attrs):
         os.path.join(GreenGrowth.output_dir, "cluster_country.csv"), index=False
     )
     rock_song.to_csv(os.path.join(GreenGrowth.output_dir, "country.csv"), index=False)
-    import pdb
-
-    pdb.set_trace()
 
 
 if __name__ == "__main__":

@@ -1,4 +1,5 @@
 import pandas as pd
+import argparse
 import os
 from sqlalchemy import MetaData, event, text, INTEGER, exc
 from sqlalchemy.schema import CreateSchema
@@ -8,11 +9,14 @@ from country_tools.country_tools_api.database.base import engine, Base
 
 from country_tools.country_tools_api.database.green_growth import (
     GGCountryProductYear,
-    GGCountryProductYearSupplyChain,
-    GGSupplyChainProductMember,
     GGSupplyChain,
     GGLocationCountry,
+    GGLocationRegion,
     GGProduct,
+    GGSupplyChainClusterProductMember,
+    GGClusterCountry,
+    GGCluster,
+    GGCountryProductYearSupplyChain,
 )
 from country_tools.green_growth.ingest import INGESTION_ATTRS
 
@@ -23,12 +27,19 @@ OUTPUT_DIR = os.path.join(
 DATA_MODELS = [
     "country_product_year",
     "country_product_year_supply_chain",
-    "supply_chain_product_member",
+    "supply_chain_cluster_product_member",
     "supply_chain",
     "location_country",
-    "product",
+    "location_region",
+    "product_hs12",
+    "cluster_country",
+    "cluster",
 ]
 SCHEMA = "green_growth"
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--tables", nargs="+", default=DATA_MODELS)
+args = parser.parse_args()
 
 
 def copy():
@@ -49,8 +60,7 @@ def copy():
         meta = MetaData()
         meta.reflect(bind=conn, schema=SCHEMA)
 
-        for table in DATA_MODELS:
-
+        for table in args.tables:
             ParquetCopy(
                 os.path.join(OUTPUT_DIR, f"{table}.parquet"),
                 conn=conn,
