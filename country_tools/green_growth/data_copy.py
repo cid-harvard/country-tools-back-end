@@ -35,7 +35,7 @@ DATA_MODELS = [
     "cluster_country",
     "cluster",
 ]
-SCHEMA = "green_growth"
+SCHEMA = "greenplexity"
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--tables", nargs="+", default=DATA_MODELS)

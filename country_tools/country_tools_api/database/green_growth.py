@@ -20,7 +20,7 @@ class GGSupplyChainClusterProductMember(Base):
     __tablename__ = "supply_chain_cluster_product_member"
     __table_args__ = (
         PrimaryKeyConstraint("supply_chain_id", "cluster_id", "product_id"),
-        {"schema": "green_growth"},
+        {"schema": "greenplexity"},
     )
     supply_chain_id = Column(
         Integer, primary_key=True
@@ -35,7 +35,7 @@ class GGCountryProductYear(Base):
     __tablename__ = "country_product_year"
     __table_args__ = (
         PrimaryKeyConstraint("country_id", "product_id", "year"),
-        {"schema": "green_growth"},
+        {"schema": "greenplexity"},
     )
     year = Column(Integer, primary_key=True)
     country_id = Column(Integer, primary_key=True)
@@ -60,7 +60,7 @@ class GGCountryProductYearSupplyChain(Base):
     __tablename__ = "country_product_year_supply_chain"
     __table_args__ = (
         PrimaryKeyConstraint("country_id", "product_id", "year", "supply_chain_id"),
-        {"schema": "green_growth"},
+        {"schema": "greenplexity"},
     )
     year = Column(Integer, primary_key=True)
     country_id = Column(Integer, primary_key=True)
@@ -73,7 +73,7 @@ class GGCountry(Base):
     __tablename__ = "country"
     __table_args__ = (
         PrimaryKeyConstraint("country_id"),
-        {"schema": "green_growth"},
+        {"schema": "greenplexity"},
     )
     country_id = Column(Integer, primary_key=True)
     coi_green = Column(Float)
@@ -86,7 +86,7 @@ class GGClusterCountry(Base):
     __tablename__ = "cluster_country"
     __table_args__ = (
         PrimaryKeyConstraint("cluster_id", "country_id"),
-        {"schema": "green_growth"},
+        {"schema": "greenplexity"},
     )
     cluster_id = Column(Integer, primary_key=True)
     country_id = Column(Integer, primary_key=True)
@@ -98,14 +98,14 @@ class GGClusterCountry(Base):
 
 class GGSupplyChain(Base):
     __tablename__ = "supply_chain"
-    __table_args__ = ({"schema": "green_growth"},)
+    __table_args__ = ({"schema": "greenplexity"},)
     supply_chain_id = Column(Integer, primary_key=True)
     supply_chain = Column(String)
 
 
 class GGCluster(Base):
     __tablename__ = "cluster"
-    __table_args__ = ({"schema": "green_growth"},)
+    __table_args__ = ({"schema": "greenplexity"},)
     cluster_id = Column(Integer, primary_key=True)
     cluster_name = Column(String)
     member_cluster = relationship(
@@ -118,7 +118,7 @@ class GGCluster(Base):
 
 class GGLocationRegion(Base):
     __tablename__ = "location_region"
-    __table_args__ = ({"schema": "green_growth"},)
+    __table_args__ = ({"schema": "greenplexity"},)
     region_id = Column(Integer, primary_key=True)
     name = Column(String)
     region_code = Column(String)
@@ -127,7 +127,7 @@ class GGLocationRegion(Base):
 
 class GGLocationCountry(Base):
     __tablename__ = "location_country"
-    __table_args__ = ({"schema": "green_growth"},)
+    __table_args__ = ({"schema": "greenplexity"},)
 
     country_id = Column(Integer, primary_key=True)
     # location_level = Column(String(50))
@@ -154,7 +154,7 @@ class GGLocationCountry(Base):
 
 class GGProduct(Base):
     __tablename__ = "product_hs12"
-    __table_args__ = ({"schema": "green_growth"},)
+    __table_args__ = ({"schema": "greenplexity"},)
 
     product_id = Column(Integer, primary_key=True)
     code = Column(String(6))
