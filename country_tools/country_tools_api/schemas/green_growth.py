@@ -172,7 +172,7 @@ class GreenGrowthQuery(graphene.ObjectType):
     gg_location_region_list = graphene.List(GGLocationRegion)
     gg_cluster_country_list = graphene.List(
         GGClusterCountry,
-        cluster_id=graphene.Int(required=True),
+        cluster_id=graphene.Int(required=False),
         country_id=graphene.Int(required=True),
     )
     gg_cpy_list = graphene.List(
