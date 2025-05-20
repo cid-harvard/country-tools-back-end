@@ -188,7 +188,7 @@ class GreenGrowthQuery(graphene.ObjectType):
     gg_country_year_list = graphene.List(
         GGCountryYear,
         year=graphene.Int(required=True),
-        country_id=graphene.Int(required=True),
+        country_id=graphene.Int(required=False),
     )
 
     def resolve_gg_country_year_list(self, info, year, country_id):  # year
