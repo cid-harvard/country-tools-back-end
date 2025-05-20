@@ -69,13 +69,14 @@ class GGCountryProductYearSupplyChain(Base):
     product_ranking = Column(Integer)
 
 
-class GGCountry(Base):
-    __tablename__ = "country"
+class GGCountryYear(Base):
+    __tablename__ = "country_year"
     __table_args__ = (
-        PrimaryKeyConstraint("country_id"),
+        PrimaryKeyConstraint("country_id", "year"),
         {"schema": "greenplexity"},
     )
     country_id = Column(Integer, primary_key=True)
+    year = Column(Integer, primary_key=True)
     coi_green = Column(Float)
     lntotnetnrexp_pc = Column(Float)
     lnypc = Column(Float)

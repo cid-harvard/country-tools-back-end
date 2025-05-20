@@ -205,7 +205,7 @@ def run(ingestion_attrs):
     # QUESTION: how many countries are in rock song?
     # TODO: if rock song is at country level then make part of country table
     rock_song = GreenGrowth.load_parquet("6_green_rock_song", GreenGrowth.last_updated)
-    rock_song = rock_song[["iso", "coi_green", "x_resid"]]
+    rock_song = rock_song[["iso", "coi_green", "x_resid", "lntotnetnrexp_pc", "lnypc"]]
     rock_song = rock_song.merge(
         country[["country_id", "iso3_code"]],
         left_on=["iso"],
@@ -314,6 +314,8 @@ def run(ingestion_attrs):
     # Green Growth
     GreenGrowth.save_parquet(cpysc, "country_product_year_supply_chain")
     GreenGrowth.save_parquet(cpy, "country_product_year")
+    rock_song["year"] = 2023
+    GreenGrowth.save_parquet(rock_song, "country_year")
 
     # save GreenGrowth data to output directory
     # classifications
@@ -344,7 +346,13 @@ def run(ingestion_attrs):
     cluster_country.to_csv(
         os.path.join(GreenGrowth.output_dir, "cluster_country.csv"), index=False
     )
-    rock_song.to_csv(os.path.join(GreenGrowth.output_dir, "country.csv"), index=False)
+
+    rock_song.to_csv(
+        os.path.join(GreenGrowth.output_dir, "country_year.csv"), index=False
+    )
+    import pdb
+
+    pdb.set_trace()
 
 
 if __name__ == "__main__":

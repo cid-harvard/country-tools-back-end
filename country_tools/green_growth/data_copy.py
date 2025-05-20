@@ -15,6 +15,7 @@ from country_tools.country_tools_api.database.green_growth import (
     GGProduct,
     GGSupplyChainClusterProductMember,
     GGClusterCountry,
+    GGCountryYear,
     GGCluster,
     GGCountryProductYearSupplyChain,
 )
@@ -26,6 +27,7 @@ OUTPUT_DIR = os.path.join(
 )
 DATA_MODELS = [
     "country_product_year",
+    "country_year",
     "country_product_year_supply_chain",
     "supply_chain_cluster_product_member",
     "supply_chain",
