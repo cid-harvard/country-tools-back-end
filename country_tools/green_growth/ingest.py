@@ -16,7 +16,7 @@ INGESTION_ATTRS = {
     # "output_dir": "/n/hausmann_lab/lab/ellie/green_growth/output/",
     "input_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/green_growth/data/input/",
     "output_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/green_growth/data/output/",
-    "last_updated": "2025_04_30",
+    "last_updated": "2025_05_30",
     "product_classification": "hs12",
     "product_level": 4,
 }
@@ -80,18 +80,24 @@ def run(ingestion_attrs):
     sc_cluster_product = GreenGrowth.load_parquet(
         "5_product_cluster_mapping", GreenGrowth.last_updated
     )
-    sc_cluster_product = sc_cluster_product.drop_duplicates(
-        subset=["product_id", "dominant_cluster"]
+    sc_cluster_product = sc_cluster_product.rename(
+        columns={"HS2012_4dg": "product_code", "dominant_cluster": "cluster_id"}
     )
     sc_cluster_product = sc_cluster_product[
-        ["supply_chain", "product_id", "dominant_cluster"]
+        ["supply_chain", "product_code", "cluster_id"]
     ]
+    sc_cluster_product = sc_cluster_product.drop_duplicates()
     sc_cluster_product = sc_cluster_product.merge(
         supply_chain, on=["supply_chain"], how="left"
+    ).merge(
+        prod[["product_id", "code"]],
+        left_on="product_code",
+        right_on="code",
+        how="left",
     )
     sc_cluster_product = sc_cluster_product.rename(
-        columns={"id": "supply_chain_id", "dominant_cluster": "cluster_id"}
-    ).drop(columns=["supply_chain"])
+        columns={"id": "supply_chain_id"}
+    ).drop(columns=["supply_chain", "code", "product_code"])
     sc_cluster_product.supply_chain_id = sc_cluster_product.supply_chain_id.astype(int)
 
     # scp = hexbin[['supply_chain','HS2012']].groupby(["supply_chain", "HS2012"]).agg("first").reset_index()
@@ -178,24 +184,17 @@ def run(ingestion_attrs):
         "cog_std",
         "feasibility_std",
         "balanced_portfolio",
-        "normalized_export_rca",
     ]
     cpy = bar_graph.merge(
-        scatterplot, on=["year", "country_id", "product_id"], how="outer"
-    ).merge(
-        hexbin[
-            [
-                "year",
-                "country_id",
-                "product_id",
-                "normalized_export_rca",
-            ]
-        ],
+        scatterplot,
         on=["year", "country_id", "product_id"],
         how="outer",
     )
     if not cpy[cpy.duplicated(subset=["year", "country_id", "product_id"])].empty:
         logging.warning("cpy has duplicates")
+        import pdb
+
+        pdb.set_trace()
     missing_values = [col for col in cpy_metrics if cpy[col].isna().any()]
     if missing_values:
         logging.warning(f"cpy has na values {missing_values}")
@@ -204,8 +203,11 @@ def run(ingestion_attrs):
     # to do country_id, regioncode link to country
     # QUESTION: how many countries are in rock song?
     # TODO: if rock song is at country level then make part of country table
-    rock_song = GreenGrowth.load_parquet("6_green_rock_song", GreenGrowth.last_updated)
-    rock_song = rock_song[["iso", "coi_green", "x_resid", "lntotnetnrexp_pc", "lnypc"]]
+    rock_song = GreenGrowth.load_csv("6_green_rock_song", GreenGrowth.last_updated)
+    rock_song = rock_song.rename(columns={"analysis_year": "year"})
+    rock_song = rock_song[
+        ["year", "iso", "coi_green", "x_resid", "lntotnetnrexp_pc", "lnypc"]
+    ]
     rock_song = rock_song.merge(
         country[["country_id", "iso3_code"]],
         left_on=["iso"],
@@ -213,8 +215,19 @@ def run(ingestion_attrs):
         how="outer",
     ).drop(columns=["iso", "iso3_code"])
     # handle missing values and duplicates
-    if not rock_song[rock_song.duplicated(subset="country_id")].empty:
+    if not rock_song[rock_song.duplicated(subset=["year", "country_id"])].empty:
+        import pdb
+
+        pdb.set_trace()
         raise ValueError("rock_song has duplicate iso values")
+    if not rock_song[rock_song.year.isna()].empty:
+        import pdb
+
+        pdb.set_trace()
+        rock_song = rock_song.dropna(subset=["year"])
+        # raise ValueError("rock_song has na values in year")
+        logging.warning("rock_song has na values in year")
+        logging.warning(rock_song[rock_song.year.isna()])
     if not rock_song[rock_song.x_resid.isna()].empty:
         logging.warning("rock_song has na values in x_resid")
         logging.warning(rock_song[rock_song.x_resid.isna()])
@@ -270,13 +283,29 @@ def run(ingestion_attrs):
     )
     cluster_country = cluster_country.rename(columns={"dominant_cluster": "cluster_id"})
     cluster_country = cluster_country[
-        ["cluster_id", "country_id", "pci", "cog", "density", "rca"]
+        [
+            "year",
+            "cluster_id",
+            "country_id",
+            "pci",
+            "cog",
+            "density",
+            "rca",
+            "export_value",
+            "global_market_share",
+        ]
     ]
 
     if not cluster_country[
-        cluster_country.duplicated(subset=["cluster_id", "country_id"])
+        cluster_country.duplicated(subset=["year", "cluster_id", "country_id"])
     ].empty:
-        raise ValueError("cluster_country has duplicate cluster and country pairs")
+        import pdb
+
+        pdb.set_trace()
+        cluster_country = cluster_country.drop_duplicates(
+            subset=["year", "cluster_id", "country_id"]
+        )
+        # raise ValueError("cluster_country has duplicate cluster and country pairs")
     if not cluster_country[
         cluster_country.pci.isna()
         | cluster_country.cog.isna()
@@ -308,13 +337,12 @@ def run(ingestion_attrs):
     GreenGrowth.save_parquet(region, "location_region")
     GreenGrowth.save_parquet(prod, f"product_{GreenGrowth.product_classification}")
     GreenGrowth.save_parquet(cluster, "cluster")
-    GreenGrowth.save_parquet(cluster_country, "cluster_country")
+    GreenGrowth.save_parquet(cluster_country, "cluster_country_year")
     GreenGrowth.save_parquet(sc_cluster_product, "supply_chain_cluster_product_member")
 
     # Green Growth
     GreenGrowth.save_parquet(cpysc, "country_product_year_supply_chain")
     GreenGrowth.save_parquet(cpy, "country_product_year")
-    rock_song["year"] = 2023
     GreenGrowth.save_parquet(rock_song, "country_year")
 
     # save GreenGrowth data to output directory

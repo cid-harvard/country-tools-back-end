@@ -1,3 +1,8 @@
+# poetry remove graphene-sqlalchemy
+# poetry add sqlalchemy@2
+# to get back to running api
+# poetry add sqlalchemy@1.4
+
 import pandas as pd
 import argparse
 import os
@@ -14,7 +19,7 @@ from country_tools.country_tools_api.database.green_growth import (
     GGLocationRegion,
     GGProduct,
     GGSupplyChainClusterProductMember,
-    GGClusterCountry,
+    GGClusterCountryYear,
     GGCountryYear,
     GGCluster,
     GGCountryProductYearSupplyChain,
@@ -34,7 +39,7 @@ DATA_MODELS = [
     "location_country",
     "location_region",
     "product_hs12",
-    "cluster_country",
+    "cluster_country_year",
     "cluster",
 ]
 SCHEMA = "greenplexity"

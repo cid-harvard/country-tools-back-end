@@ -5,23 +5,23 @@ import numpy as np
 
 
 class Ingestion(object):
-    def __init__(self, 
-                 input_dir: str, 
-                 output_dir: str, 
-                 last_updated: str, 
-                 product_classification="hs12",
-                 product_level=4,
-                ):
-        
+    def __init__(
+        self,
+        input_dir: str,
+        output_dir: str,
+        last_updated: str,
+        product_classification="hs12",
+        product_level=4,
+    ):
+
         self.input_dir = input_dir
         # self.classifications_dir = os.path.join(input_dir, "classifications")
         self.product_classification = product_classification
-        self.product_level = product_level 
+        self.product_level = product_level
         self.output_dir = os.path.join(output_dir, last_updated)
         self.last_updated = last_updated
-                
-        os.makedirs(self.output_dir, exist_ok=True)
 
+        os.makedirs(self.output_dir, exist_ok=True)
 
     def load_parquet(
         self,
@@ -43,6 +43,20 @@ class Ingestion(object):
             return pd.read_parquet(
                 os.path.join(read_dir, f"{table_name}.parquet"), filters=filters
             )
+
+    def load_csv(
+        self,
+        table_name: str,
+        schema: typing.Optional[str] = None,
+        filters: typing.Optional[object] = None,
+        dask_df: bool = False,
+    ):
+        if schema is not None:
+            read_dir = os.path.join(self.input_dir, schema)
+        else:
+            read_dir = os.path.join(self.input_dir)
+
+        return pd.read_csv(os.path.join(read_dir, f"{table_name}.csv"))
 
     def save_parquet(
         self,

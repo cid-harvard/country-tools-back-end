@@ -41,7 +41,6 @@ class GGCountryProductYear(Base):
     country_id = Column(Integer, primary_key=True)
     product_id = Column(Integer, primary_key=True)
     export_rca = Column(Float)
-    normalized_export_rca = Column(Float)
     export_value = Column(Float)
     expected_exports = Column(Float)
     feasibility_std = Column(Float)
@@ -83,18 +82,21 @@ class GGCountryYear(Base):
     x_resid = Column(Float)
 
 
-class GGClusterCountry(Base):
-    __tablename__ = "cluster_country"
+class GGClusterCountryYear(Base):
+    __tablename__ = "cluster_country_year"
     __table_args__ = (
-        PrimaryKeyConstraint("cluster_id", "country_id"),
+        PrimaryKeyConstraint("cluster_id", "country_id", "year"),
         {"schema": "greenplexity"},
     )
     cluster_id = Column(Integer, primary_key=True)
     country_id = Column(Integer, primary_key=True)
+    year = Column(Integer, primary_key=True)
     pci = Column(Float)
     cog = Column(Float)
     density = Column(Float)
     rca = Column(Float)
+    export_value = Column(Float)
+    global_market_share = Column(Float)
 
 
 class GGSupplyChain(Base):

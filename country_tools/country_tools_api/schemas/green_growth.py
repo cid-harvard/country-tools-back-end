@@ -24,7 +24,6 @@ class GGCountryYear(graphene.ObjectType):
         model = green_growth_db.GGCountryYear
         interfaces = (Node,)
 
-    # year = graphene.Int()
     country_id = graphene.Int()
     year = graphene.Int()
     coi_green = graphene.Float()
@@ -42,7 +41,6 @@ class GGCountryProductYear(graphene.ObjectType):
     country_id = graphene.Int()
     product_id = graphene.Int()
     export_rca = graphene.Float()
-    normalized_export_rca = graphene.Float()
     export_value = graphene.Float()
     expected_exports = graphene.Float()
     normalized_pci = graphene.Float()
@@ -69,11 +67,12 @@ class GGCountryProductYearSupplyChain(graphene.ObjectType):
     product_ranking = graphene.Int()
 
 
-class GGClusterCountry(graphene.ObjectType):
+class GGClusterCountryYear(graphene.ObjectType):
     class Meta:
-        model = green_growth_db.GGClusterCountry
+        model = green_growth_db.GGClusterCountryYear
         interfaces = (Node,)
 
+    year = graphene.Int()
     country_id = graphene.Int()
     cluster_id = graphene.Int()
     pci = graphene.Float()
@@ -109,17 +108,6 @@ class GGLocationRegion(graphene.ObjectType):
     name = graphene.String()
     region_code = graphene.String()
     country_id = graphene.Int()
-
-
-class GGCountryProductYearSupplyChain(graphene.ObjectType):
-    class Meta:
-        model = green_growth_db.GGCountryProductYearSupplyChain
-        interfaces = (Node,)
-
-    year = graphene.Int()
-    country_id = graphene.Int()
-    supply_chain_id = graphene.Int()
-    product_id = graphene.Int()
 
 
 class GGLocationCountry(graphene.ObjectType):
@@ -166,14 +154,18 @@ class GreenGrowthQuery(graphene.ObjectType):
     gg_location_country_list = graphene.List(GGLocationCountry)
     gg_supply_chain_list = graphene.List(GGSupplyChain)
     gg_supply_chain_cluster_product_member_list = graphene.List(
-        GGSupplyChainClusterProductMember
+        GGSupplyChainClusterProductMember,
+        supply_chain_id=graphene.Int(required=True),
+        cluster_id=graphene.Int(required=False),
+        product_id=graphene.Int(required=False),
     )
     gg_cluster_list = graphene.List(GGCluster)
     gg_location_region_list = graphene.List(GGLocationRegion)
-    gg_cluster_country_list = graphene.List(
-        GGClusterCountry,
+    gg_cluster_country_year_list = graphene.List(
+        GGClusterCountryYear,
         cluster_id=graphene.Int(required=False),
         country_id=graphene.Int(required=True),
+        year=graphene.Int(required=True),
     )
     gg_cpy_list = graphene.List(
         GGCountryProductYear,
@@ -198,11 +190,12 @@ class GreenGrowthQuery(graphene.ObjectType):
             .filter(green_growth_db.GGCountryYear.country_id == country_id)
         )
 
-    def resolve_gg_cluster_country_list(self, info, cluster_id, country_id):
+    def resolve_gg_cluster_country_year_list(self, info, cluster_id, country_id, year):
         return (
-            db_session.query(green_growth_db.GGClusterCountry)
-            .filter(green_growth_db.GGClusterCountry.cluster_id == cluster_id)
-            .filter(green_growth_db.GGClusterCountry.country_id == country_id)
+            db_session.query(green_growth_db.GGClusterCountryYear)
+            .filter(green_growth_db.GGClusterCountryYear.cluster_id == cluster_id)
+            .filter(green_growth_db.GGClusterCountryYear.country_id == country_id)
+            .filter(green_growth_db.GGClusterCountryYear.year == year)
         )
 
     def resolve_gg_cpy_list(self, info, year, country_id):
@@ -219,6 +212,7 @@ class GreenGrowthQuery(graphene.ObjectType):
             .filter(
                 green_growth_db.GGCountryProductYearSupplyChain.country_id == country_id
             )
+            .all()
         )
 
     def resolve_gg_product_list(self, info, **args):
