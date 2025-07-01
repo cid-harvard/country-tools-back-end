@@ -46,6 +46,7 @@ class GGCountryProductYear(graphene.ObjectType):
     normalized_pci = graphene.Float()
     normalized_cog = graphene.Float()
     feasibility = graphene.Float()
+    density = graphene.Float()
     effective_number_of_exporters = graphene.Float()
     product_market_share_growth = graphene.Float()
     market_growth = graphene.Float()

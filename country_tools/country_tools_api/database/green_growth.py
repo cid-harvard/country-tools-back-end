@@ -51,6 +51,7 @@ class GGCountryProductYear(Base):
     normalized_cog = Column(Float)
     density = Column(Float)
     normalized_pci = Column(Float)
+    product_market_share = Column(Float)
     effective_number_of_exporters = Column(Float)
     product_market_share_growth = Column(Float)
 
