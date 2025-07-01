@@ -81,6 +81,7 @@ class GGCountryYear(Base):
     lntotnetnrexp_pc = Column(Float)
     lnypc = Column(Float)
     x_resid = Column(Float)
+    policy_recommendation = Column(String)
 
 
 class GGClusterCountryYear(Base):

@@ -30,6 +30,7 @@ class GGCountryYear(graphene.ObjectType):
     lntotnetnrexp_pc = graphene.Float()
     lnypc = graphene.Float()
     x_resid = graphene.Float()
+    policy_recommendation = graphene.String()
 
 
 class GGCountryProductYear(graphene.ObjectType):

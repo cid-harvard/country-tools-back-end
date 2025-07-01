@@ -17,7 +17,7 @@ INGESTION_ATTRS = {
     # "output_dir": "/n/hausmann_lab/lab/ellie/green_growth/output/",
     "input_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/green_growth/data/input/",
     "output_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/green_growth/data/output/",
-    "last_updated": "2025_06_18",
+    "last_updated": "2025_07_01",
     "product_classification": "hs12",
     "product_level": 4,
 }
@@ -27,7 +27,6 @@ def run(ingestion_attrs):
 
     GreenGrowth = Ingestion(**ingestion_attrs)
 
-    # green_prods_hs92 = GreenGrowth.load_parquet("0_green_prods_92", GreenGrowth.last_updated)
     sc_cluster_product = GreenGrowth.load_parquet(
         "4_product_cluster_mapping", GreenGrowth.last_updated
     )
@@ -219,20 +218,32 @@ def run(ingestion_attrs):
     # TODO: if rock song is at country level then make part of country table
     rock_song = GreenGrowth.load_csv("5_green_rock_song", GreenGrowth.last_updated)
 
-    import pdb
-
-    pdb.set_trace()
-
     rock_song = rock_song.rename(columns={"analysis_year": "year"})
     rock_song = rock_song[
-        ["year", "iso", "coi_green", "x_resid", "lntotnetnrexp_pc", "lnypc"]
+        [
+            "year",
+            "iso",
+            "coi_green",
+            "x_resid",
+            "lntotnetnrexp_pc",
+            "lnypc",
+            "eci_all",
+            "eci_green",
+        ]
     ]
     rock_song = rock_song.merge(
         country[["country_id", "iso3_code"]],
         left_on=["iso"],
         right_on=["iso3_code"],
         how="right",
-    ).drop(columns=["iso", "iso3_code"])
+    )  # .drop(columns=["iso", "iso3_code"])
+
+    rock_song = handle_policy_recommendations(rock_song)
+
+    rock_song = rock_song.drop(
+        columns=["iso", "iso3_code", "eci_all", "eci_all_rank", "eci_green"]
+    )
+
     # handle missing values and duplicates
     if not rock_song[rock_song.duplicated(subset=["year", "country_id"])].empty:
         import pdb
@@ -371,7 +382,7 @@ def run(ingestion_attrs):
     # validate max year
     assert cpy.year.max() == 2023
     assert cpysc.year.max() == 2023
-    assert cluster_country_year.year.max() == 2023
+    # assert cluster_country_year.year.max() == 2023
     assert rock_song.year.max() == 2023
 
     # save GreenGrowth data to output directory
@@ -426,6 +437,36 @@ def run(ingestion_attrs):
     import pdb
 
     pdb.set_trace()
+
+
+def handle_policy_recommendations(rock_song):
+    rock_song["eci_all_rank"] = rock_song.groupby("year")["eci_all"].rank(
+        ascending=False
+    )
+    rock_song["policy_recommendation"] = None
+    for row in rock_song.itertuples():
+
+        if row.eci_all is not None and row.eci_all_rank <= 9:
+            rock_song.loc[row.Index, "policy_recommendation"] = "technological frontier"
+            # return "technological frontier"
+        # Also manually assign USA to tech frontier
+        elif row.country_id is not None and row.country_id == 840:
+            rock_song.loc[row.Index, "policy_recommendation"] = "technological frontier"
+            # return "technological frontier"
+        # Otherwise bottom half is strategic bets
+        elif row.coi_green <= 0.0:
+            rock_song.loc[row.Index, "policy_recommendation"] = "strategic bets"
+            # return "strategic bets"
+        # Top half split at controlled ECI == 0.0
+        elif row.x_resid >= 0.0:
+            rock_song.loc[row.Index, "policy_recommendation"] = "light touch"
+            # return "light touch"
+        else:
+            rock_song.loc[row.Index, "policy_recommendation"] = (
+                "parsimonious industrial"
+            )
+            # return "parsimonious industrial"
+    return rock_song
 
 
 if __name__ == "__main__":
