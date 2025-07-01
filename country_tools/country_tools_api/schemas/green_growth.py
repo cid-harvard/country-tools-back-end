@@ -53,6 +53,11 @@ class GGCountryProductYear(graphene.ObjectType):
     pci_std = graphene.Float()
     cog_std = graphene.Float()
     feasibility_std = graphene.Float()
+    # for now but empty and not used
+    feasibility = graphene.Float()
+    effective_number_of_exporters = graphene.Float()
+    product_market_share_growth_std = graphene.Float()
+    pci_cog_feasibility_composite = graphene.Float()
 
 
 class GGCountryProductYearSupplyChain(graphene.ObjectType):
