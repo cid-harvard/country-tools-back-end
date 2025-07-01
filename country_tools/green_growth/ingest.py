@@ -385,6 +385,10 @@ def run(ingestion_attrs):
     # assert cluster_country_year.year.max() == 2023
     assert rock_song.year.max() == 2023
 
+    import pdb
+
+    pdb.set_trace()
+
     # save GreenGrowth data to output directory
     # classifications
     GreenGrowth.save_parquet(supply_chain, "supply_chain")
