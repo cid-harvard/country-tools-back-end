@@ -189,11 +189,9 @@ class GreenGrowthQuery(graphene.ObjectType):
         country_id=graphene.Int(required=False),
     )
 
-    def resolve_gg_country_year_list(self, info, year, country_id):  # year
-        return (
-            db_session.query(green_growth_db.GGCountryYear)
-            .filter(green_growth_db.GGCountryYear.year == year)
-            .filter(green_growth_db.GGCountryYear.country_id == country_id)
+    def resolve_gg_country_year_list(self, info, year):
+        return db_session.query(green_growth_db.GGCountryYear).filter(
+            green_growth_db.GGCountryYear.year == year
         )
 
     def resolve_gg_cluster_country_year_list(self, info, cluster_id, country_id, year):
