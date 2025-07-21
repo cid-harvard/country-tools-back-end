@@ -8,18 +8,40 @@ pd.options.display.max_rows = None
 pd.set_option("max_colwidth", 400)
 
 logging.basicConfig(level=logging.INFO)
-# from green_growth.table_objects.base import Ingestion
 from green_growth.table_objects.base import Ingestion
 
+
+UNIQUE_GG_4DIGIT_PRODUCTS = 195
+LAST_YEAR = 2023
 
 INGESTION_ATTRS = {
     # "input_dir": "/n/hausmann_lab/lab/_shared_dev_data/green_growth/input/",
     # "output_dir": "/n/hausmann_lab/lab/ellie/green_growth/output/",
     "input_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/green_growth/data/input/",
     "output_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/green_growth/data/output/",
-    "last_updated": "2025_07_01",
+    "last_updated": "2025_07_18",
     "product_classification": "hs12",
     "product_level": 4,
+}
+
+FILE_NAME_MAP = {
+    "hexbin": "0_hexbin_input",
+    "supply_chain": "1_supply_chain_input",
+    "bar_graph_gravity": "1_expected_actual_gravity",
+    "bar_graph_rca": "2_expected_actual_rca",
+    "scatterplot": "3_scatterplot_input",
+    "spiders": "4_spiders",
+    "sc_cluster_product": "5_product_cluster_mapping",
+    "cluster_country_year": "6_cluster_country_metrics",
+    "rock_song": "7_green_rock_song",
+}
+
+# create a dictionary of the strategy names and their descriptions
+STRATEGY_DESCRIPTIONS = {
+    "balanced_portfolio": "Climb the Complexity Ladder",
+    "low_hanging_fruit": "Harness Nearby Opportunities",
+    "frontier": "Maintain competitive Edge",
+    "long_jump": "Reinvent industrial base",
 }
 
 
@@ -28,9 +50,9 @@ def run(ingestion_attrs):
     GreenGrowth = Ingestion(**ingestion_attrs)
 
     sc_cluster_product = GreenGrowth.load_parquet(
-        "4_product_cluster_mapping", GreenGrowth.last_updated
+        FILE_NAME_MAP["sc_cluster_product"], GreenGrowth.last_updated
     )
-    hexbin = GreenGrowth.load_parquet("0_hexbin_input", GreenGrowth.last_updated)
+    hexbin = GreenGrowth.load_parquet(FILE_NAME_MAP["hexbin"], GreenGrowth.last_updated)
 
     # supply chain classification
     supply_chain = (
@@ -74,7 +96,7 @@ def run(ingestion_attrs):
 
     # cross reference table, supply chain to cluster to 4digit product
     sc_cluster_product = GreenGrowth.load_parquet(
-        "4_product_cluster_mapping", GreenGrowth.last_updated
+        FILE_NAME_MAP["sc_cluster_product"], GreenGrowth.last_updated
     )
 
     green_prods = sc_cluster_product["HS2012_4dg"].unique()
@@ -128,26 +150,46 @@ def run(ingestion_attrs):
     ]
 
     hexbin = hexbin[["year", "country_id", "product_id", "normalized_export_rca"]]
+    hexbin = hexbin.drop_duplicates(subset=["year", "country_id", "product_id"])
+    hexbin = hexbin.rename(columns={"normalized_export_rca": "export_rca"})
 
     green_products = hexbin.product_id.unique()
     prod = prod[prod.product_id.isin(green_products)]
 
     # country product year plots
-    bar_graph = (
-        GreenGrowth.load_parquet("1_expected_actual", GreenGrowth.last_updated)
-        .merge(country[["country_id", "iso3_code"]], on=["iso3_code"], how="inner")
+    bar_graph_gravity = (
+        GreenGrowth.load_parquet(
+            FILE_NAME_MAP["bar_graph_gravity"], GreenGrowth.last_updated
+        )
+        .merge(
+            country[["country_id", "iso3_code"]],
+            left_on="iso3_country_id",
+            right_on="iso3_code",
+            how="inner",
+        )
         .merge(
             prod[["product_id", "code"]], left_on="HS2012", right_on="code", how="inner"
         )
     )
-    bar_graph = bar_graph[
-        ["year", "country_id", "product_id", "export_value", "expected_exports"]
+
+    bar_graph_gravity = bar_graph_gravity.rename(
+        columns={
+            "expected_exports_gravity": "expected_exports",
+        }
+    )
+    bar_graph_gravity = bar_graph_gravity[
+        [
+            "year",
+            "country_id",
+            "product_id",
+            "export_value",
+            "expected_exports",
+        ]
     ]
-    bar_graph = bar_graph.drop_duplicates(subset=["year", "country_id", "product_id"])
 
     # scatterplot
     scatterplot = GreenGrowth.load_parquet(
-        "2_scatterplot_input", GreenGrowth.last_updated
+        FILE_NAME_MAP["scatterplot"], GreenGrowth.last_updated
     )
 
     scatterplot["country_id"] = scatterplot["country_id"].astype(int)
@@ -159,8 +201,8 @@ def run(ingestion_attrs):
             on=["country_id", "iso3_code"],
             how="inner",
         )
-        .merge(supply_chain, on=["supply_chain"], how="left")
-        .rename(columns={"id": "supply_chain_id"})
+        # .merge(supply_chain, on=["supply_chain"], how="left")
+        # .rename(columns={"id": "supply_chain_id"})
     )
 
     # .merge(
@@ -172,11 +214,15 @@ def run(ingestion_attrs):
             "year",
             "country_id",
             "product_id",
-            "export_rca",
+            # "export_rca",
             "pci_std",
             "cog_std",
-            "feasibility_std",
-            "balanced_portfolio",
+            # "feasibility_std",
+            "density_std",
+            "strat_balanced_portfolio",
+            "strat_long_jump",
+            "strat_low_hang_fruit",
+            "strat_frontier",
         ]
     ]
     scatterplot = scatterplot.drop_duplicates(
@@ -189,12 +235,21 @@ def run(ingestion_attrs):
         "export_rca",
         "pci_std",
         "cog_std",
-        "feasibility_std",
-        "balanced_portfolio",
+        "density_std",
+        "strat_balanced_portfolio",
+        "strat_long_jump",
+        "strat_low_hang_fruit",
+        "strat_frontier",
     ]
+    # "export_rca",
+    # "feasibility_std",
 
-    cpy = bar_graph.merge(
+    cpy = bar_graph_gravity.merge(
         scatterplot,
+        on=["year", "country_id", "product_id"],
+        how="outer",
+    ).merge(
+        hexbin,
         on=["year", "country_id", "product_id"],
         how="outer",
     )
@@ -204,7 +259,7 @@ def run(ingestion_attrs):
         import pdb
 
         pdb.set_trace()
-    missing_values = [col for col in cpy_metrics if cpy[col].isna().any()]
+    missing_values = [col for col in cpy_metrics if cpy[col].isna().any().any()]
     if missing_values:
         import pdb
 
@@ -216,7 +271,9 @@ def run(ingestion_attrs):
     # to do country_id, regioncode link to country
     # QUESTION: how many countries are in rock song?
     # TODO: if rock song is at country level then make part of country table
-    rock_song = GreenGrowth.load_csv("5_green_rock_song", GreenGrowth.last_updated)
+    rock_song = GreenGrowth.load_csv(
+        FILE_NAME_MAP["rock_song"], GreenGrowth.last_updated
+    )
 
     rock_song = rock_song.rename(columns={"analysis_year": "year"})
     rock_song = rock_song[
@@ -267,7 +324,9 @@ def run(ingestion_attrs):
 
     # handle spider metrics
     # year, supply_chain, country, product level
-    spiders = GreenGrowth.load_parquet("3_spiders", GreenGrowth.last_updated)
+    spiders = GreenGrowth.load_parquet(
+        FILE_NAME_MAP["spiders"], GreenGrowth.last_updated
+    )
 
     spiders = spiders.explode("supply_chain").reset_index(drop=True)
     spiders["country_id"] = spiders["country_id"].astype(int)
@@ -312,7 +371,7 @@ def run(ingestion_attrs):
 
     # cluster country metrics
     cluster_country_year = GreenGrowth.load_parquet(
-        "6_cluster_country_metrics", GreenGrowth.last_updated
+        FILE_NAME_MAP["cluster_country_year"], GreenGrowth.last_updated
     )
 
     cluster = cluster_country_year[["dominant_cluster", "cluster_name"]]
@@ -364,26 +423,26 @@ def run(ingestion_attrs):
             ]
         )
 
-    import pdb
-
-    pdb.set_trace()
-
     # check for inclusion at 4 digit level
-    assert prod.product_id.nunique() == 195
-    assert cpy.product_id.nunique() == 202
-    assert hexbin.product_id.nunique() == 195
-    assert bar_graph.product_id.nunique() == 195
-    assert scatterplot.product_id.nunique() == 202
-    assert spiders.product_id.nunique() == 202
+    # combine assert into one?
+    dataframes = [
+        prod,
+        cpy,
+        hexbin,
+        bar_graph_gravity,
+        scatterplot,
+        spiders,
+    ]
+    assert all(
+        df.product_id.nunique() == UNIQUE_GG_4DIGIT_PRODUCTS for df in dataframes
+    )
 
     # cluster
     assert cluster.cluster_id.nunique() == 34
 
     # validate max year
-    assert cpy.year.max() == 2023
-    assert cpysc.year.max() == 2023
-    # assert cluster_country_year.year.max() == 2023
-    assert rock_song.year.max() == 2023
+    dataframes = [cpy, cpysc, cluster_country_year, rock_song]
+    assert all(df.year.max() == LAST_YEAR for df in dataframes)
 
     import pdb
 
@@ -438,12 +497,14 @@ def run(ingestion_attrs):
         os.path.join(GreenGrowth.output_dir, "country_year.csv"), index=False
     )
 
-    import pdb
-
-    pdb.set_trace()
-
 
 def handle_policy_recommendations(rock_song):
+    """
+    # technological frontier: green growth leaders => Maintain competitive Edge => Frontier strategy
+    # parsimonious industrial: well connected, low complexity => Climb the Complexity Ladder => Balanced Portfolio Strategy
+    # strategic bets: emerging opportunities => Reinvent industrial base => Long Jump strategy
+    # light touch: high complexity, not well connected => Harness Nearby Opportunities => Low Hanging Fruit strategy
+    """
     rock_song["eci_all_rank"] = rock_song.groupby("year")["eci_all"].rank(
         ascending=False
     )
@@ -452,24 +513,19 @@ def handle_policy_recommendations(rock_song):
 
         if row.eci_all is not None and row.eci_all_rank <= 9:
             rock_song.loc[row.Index, "policy_recommendation"] = "technological frontier"
-            # return "technological frontier"
         # Also manually assign USA to tech frontier
         elif row.country_id is not None and row.country_id == 840:
             rock_song.loc[row.Index, "policy_recommendation"] = "technological frontier"
-            # return "technological frontier"
         # Otherwise bottom half is strategic bets
         elif row.coi_green <= 0.0:
             rock_song.loc[row.Index, "policy_recommendation"] = "strategic bets"
-            # return "strategic bets"
         # Top half split at controlled ECI == 0.0
         elif row.x_resid >= 0.0:
             rock_song.loc[row.Index, "policy_recommendation"] = "light touch"
-            # return "light touch"
         else:
             rock_song.loc[row.Index, "policy_recommendation"] = (
                 "parsimonious industrial"
             )
-            # return "parsimonious industrial"
     return rock_song
 
 

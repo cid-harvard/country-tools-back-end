@@ -46,7 +46,12 @@ class GGCountryProductYear(Base):
     feasibility_std = Column(Float)
     pci_std = Column(Float)
     cog_std = Column(Float)
+    # introduced four strategies
     balanced_portfolio = Column(Float)
+    long_jump = Column(Float)
+    low_hanging_fruit = Column(Float)
+    frontier = Column(Float)
+
     global_market_share = Column(Float)
     normalized_cog = Column(Float)
     density = Column(Float)
