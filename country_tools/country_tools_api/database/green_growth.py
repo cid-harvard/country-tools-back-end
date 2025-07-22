@@ -47,10 +47,10 @@ class GGCountryProductYear(Base):
     pci_std = Column(Float)
     cog_std = Column(Float)
     # introduced four strategies
-    balanced_portfolio = Column(Float)
-    long_jump = Column(Float)
-    low_hanging_fruit = Column(Float)
-    frontier = Column(Float)
+    strategy_balanced_portfolio = Column(Float)
+    strategy_long_jump = Column(Float)
+    strategy_low_hanging_fruit = Column(Float)
+    strategy_frontier = Column(Float)  # green growth leaders
 
     global_market_share = Column(Float)
     normalized_cog = Column(Float)
@@ -87,6 +87,7 @@ class GGCountryYear(Base):
     lnypc = Column(Float)
     x_resid = Column(Float)
     policy_recommendation = Column(String)
+    strategy = Column(String)
 
 
 class GGClusterCountryYear(Base):

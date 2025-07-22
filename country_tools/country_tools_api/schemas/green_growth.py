@@ -31,6 +31,7 @@ class GGCountryYear(graphene.ObjectType):
     lnypc = graphene.Float()
     x_resid = graphene.Float()
     policy_recommendation = graphene.String()
+    strategy = graphene.String()
 
 
 class GGCountryProductYear(graphene.ObjectType):
@@ -53,12 +54,16 @@ class GGCountryProductYear(graphene.ObjectType):
     pci_std = graphene.Float()
     cog_std = graphene.Float()
     feasibility_std = graphene.Float()
+    strategy_balanced_portfolio = graphene.Float()
+    strategy_long_jump = graphene.Float()
+    strategy_low_hanging_fruit = graphene.Float()
+    strategy_frontier = graphene.Float()
     # for now but empty and not used
-    feasibility = graphene.Float()
-    effective_number_of_exporters = graphene.Float()
-    product_market_share_growth_std = graphene.Float()
-    pci_cog_feasibility_composite = graphene.Float()
-    market_growth = graphene.Float()
+    # feasibility = graphene.Float()
+    # effective_number_of_exporters = graphene.Float()
+    # product_market_share_growth_std = graphene.Float()
+    # pci_cog_feasibility_composite = graphene.Float()
+    # market_growth = graphene.Float()
 
 
 class GGCountryProductYearSupplyChain(graphene.ObjectType):

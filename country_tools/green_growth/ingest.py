@@ -195,6 +195,16 @@ def run(ingestion_attrs):
     scatterplot["country_id"] = scatterplot["country_id"].astype(int)
     scatterplot["product_id"] = scatterplot["product_id"].astype(int)
 
+    scatterplot = scatterplot.rename(columns={"density_std": "feasibility_std"})
+    scatterplot = scatterplot.rename(
+        columns={
+            "strat_balanced_portfolio": "strategy_balanced_portfolio",
+            "strat_long_jump": "strategy_long_jump",
+            "strat_low_hang_fruit": "strategy_low_hanging_fruit",
+            "strat_frontier": "strategy_frontier",
+        }
+    )
+
     scatterplot = (
         scatterplot.merge(
             country[["country_id", "iso3_code"]],
@@ -214,15 +224,13 @@ def run(ingestion_attrs):
             "year",
             "country_id",
             "product_id",
-            # "export_rca",
             "pci_std",
             "cog_std",
-            # "feasibility_std",
-            "density_std",
-            "strat_balanced_portfolio",
-            "strat_long_jump",
-            "strat_low_hang_fruit",
-            "strat_frontier",
+            "feasibility_std",
+            "strategy_balanced_portfolio",
+            "strategy_long_jump",
+            "strategy_low_hanging_fruit",
+            "strategy_frontier",
         ]
     ]
     scatterplot = scatterplot.drop_duplicates(
@@ -235,14 +243,12 @@ def run(ingestion_attrs):
         "export_rca",
         "pci_std",
         "cog_std",
-        "density_std",
-        "strat_balanced_portfolio",
-        "strat_long_jump",
-        "strat_low_hang_fruit",
-        "strat_frontier",
+        "feasibility_std",
+        "strategy_balanced_portfolio",
+        "strategy_long_jump",
+        "strategy_low_hanging_fruit",
+        "strategy_frontier",
     ]
-    # "export_rca",
-    # "feasibility_std",
 
     cpy = bar_graph_gravity.merge(
         scatterplot,
@@ -512,20 +518,37 @@ def handle_policy_recommendations(rock_song):
     for row in rock_song.itertuples():
 
         if row.eci_all is not None and row.eci_all_rank <= 9:
-            rock_song.loc[row.Index, "policy_recommendation"] = "technological frontier"
+            # frontier strategy
+            rock_song.loc[row.Index, "policy_recommendation"] = (
+                "Maintain competitive edge"
+            )
+            rock_song.loc[row.Index, "strategy"] = "Frontier"
         # Also manually assign USA to tech frontier
         elif row.country_id is not None and row.country_id == 840:
-            rock_song.loc[row.Index, "policy_recommendation"] = "technological frontier"
+            rock_song.loc[row.Index, "policy_recommendation"] = (
+                "Maintain competitive edge"
+            )
+            rock_song.loc[row.Index, "strategy"] = "Frontier"
         # Otherwise bottom half is strategic bets
         elif row.coi_green <= 0.0:
-            rock_song.loc[row.Index, "policy_recommendation"] = "strategic bets"
+            # strategic bets
+            rock_song.loc[row.Index, "policy_recommendation"] = (
+                "Reinvent industrial base"
+            )
+            rock_song.loc[row.Index, "strategy"] = "Long jump"
         # Top half split at controlled ECI == 0.0
         elif row.x_resid >= 0.0:
-            rock_song.loc[row.Index, "policy_recommendation"] = "light touch"
-        else:
+            #  light touch
             rock_song.loc[row.Index, "policy_recommendation"] = (
-                "parsimonious industrial"
+                "Harness nearby opportunities"
             )
+            rock_song.loc[row.Index, "strategy"] = "Low hanging fruit"
+        else:
+            # parsimonious industrial
+            rock_song.loc[row.Index, "policy_recommendation"] = (
+                "Climb the complexity ladder"
+            )
+            rock_song.loc[row.Index, "strategy"] = "Balanced portfolio"
     return rock_song
 
 
