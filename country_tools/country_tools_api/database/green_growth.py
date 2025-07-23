@@ -104,7 +104,11 @@ class GGClusterCountryYear(Base):
     density = Column(Float)
     rca = Column(Float)
     export_value = Column(Float)
-    global_market_share = Column(Float)
+    strategy_balanced_portfolio = Column(Float)
+    strategy_long_jump = Column(Float)
+    strategy_low_hanging_fruit = Column(Float)
+    strategy_frontier = Column(Float)
+    # global_market_share = Column(Float)
 
 
 class GGSupplyChain(Base):

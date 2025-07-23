@@ -19,14 +19,14 @@ INGESTION_ATTRS = {
     # "output_dir": "/n/hausmann_lab/lab/ellie/green_growth/output/",
     "input_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/green_growth/data/input/",
     "output_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/green_growth/data/output/",
-    "last_updated": "2025_07_18",
+    "last_updated": "2025_07_22",
     "product_classification": "hs12",
     "product_level": 4,
 }
 
 FILE_NAME_MAP = {
     "hexbin": "0_hexbin_input",
-    "supply_chain": "1_supply_chain_input",
+    # "supply_chain": "1_supply_chain_input",
     "bar_graph_gravity": "1_expected_actual_gravity",
     "bar_graph_rca": "2_expected_actual_rca",
     "scatterplot": "3_scatterplot_input",
@@ -205,19 +205,11 @@ def run(ingestion_attrs):
         }
     )
 
-    scatterplot = (
-        scatterplot.merge(
-            country[["country_id", "iso3_code"]],
-            on=["country_id", "iso3_code"],
-            how="inner",
-        )
-        # .merge(supply_chain, on=["supply_chain"], how="left")
-        # .rename(columns={"id": "supply_chain_id"})
+    scatterplot = scatterplot.merge(
+        country[["country_id", "iso3_code"]],
+        on=["country_id", "iso3_code"],
+        how="inner",
     )
-
-    # .merge(
-    #     prod[["product_id", "code"]], left_on="HS2012", right_on="code", how="inner"
-    # )
 
     scatterplot = scatterplot[
         [
@@ -380,12 +372,24 @@ def run(ingestion_attrs):
         FILE_NAME_MAP["cluster_country_year"], GreenGrowth.last_updated
     )
 
-    cluster = cluster_country_year[["dominant_cluster", "cluster_name"]]
+    import pdb
+
+    pdb.set_trace()
+
+    cluster = cluster_country_year[["cluster_id", "cluster_name"]]
     cluster = cluster.drop_duplicates()
-    cluster = cluster.rename(columns={"dominant_cluster": "cluster_id"})
 
     cluster_country_year = cluster_country_year.rename(
-        columns={"dominant_cluster": "cluster_id"}
+        columns={
+            "export_rca": "rca",
+            "pci_std": "pci",
+            "cog_std": "cog",
+            "density_std": "density",
+            "strat_balanced_portfolio": "strategy_balanced_portfolio",
+            "strat_long_jump": "strategy_long_jump",
+            "strat_low_hang_fruit": "strategy_low_hanging_fruit",
+            "strat_frontier": "strategy_frontier",
+        }
     )
     cluster_country_year = cluster_country_year[
         [
@@ -397,7 +401,11 @@ def run(ingestion_attrs):
             "density",
             "rca",
             "export_value",
-            "global_market_share",
+            "strategy_balanced_portfolio",
+            "strategy_long_jump",
+            "strategy_low_hanging_fruit",
+            "strategy_frontier",
+            # "global_market_share",
         ]
     ]
 

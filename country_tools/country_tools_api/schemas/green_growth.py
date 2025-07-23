@@ -90,6 +90,10 @@ class GGClusterCountryYear(graphene.ObjectType):
     cog = graphene.Float()
     density = graphene.Float()
     rca = graphene.Float()
+    strategy_balanced_portfolio = graphene.Float()
+    strategy_long_jump = graphene.Float()
+    strategy_low_hanging_fruit = graphene.Float()
+    strategy_frontier = graphene.Float()
 
 
 class GGSupplyChain(graphene.ObjectType):
