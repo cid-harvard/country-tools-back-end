@@ -56,6 +56,10 @@ def copy():
     print(f"Database Connection: {engine}")
     print("****************************************")
 
+    import pdb
+
+    pdb.set_trace()
+
     with engine.connect() as conn:
         conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA};"))
         conn.commit()

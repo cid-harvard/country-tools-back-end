@@ -5,7 +5,6 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 from country_tools.country_tools_api.database.base import db_session
 from country_tools.country_tools_api.database import green_growth as green_growth_db
-
 from country_tools.country_tools_api.schemas.util import sqlalchemy_filter
 
 
@@ -58,12 +57,6 @@ class GGCountryProductYear(graphene.ObjectType):
     strategy_long_jump = graphene.Float()
     strategy_low_hanging_fruit = graphene.Float()
     strategy_frontier = graphene.Float()
-    # for now but empty and not used
-    # feasibility = graphene.Float()
-    # effective_number_of_exporters = graphene.Float()
-    # product_market_share_growth_std = graphene.Float()
-    # pci_cog_feasibility_composite = graphene.Float()
-    # market_growth = graphene.Float()
 
 
 class GGCountryProductYearSupplyChain(graphene.ObjectType):
@@ -203,10 +196,11 @@ class GreenGrowthQuery(graphene.ObjectType):
             db_session.query(green_growth_db.GGCountryYear)
             .filter(green_growth_db.GGCountryYear.year == year)
             .filter(green_growth_db.GGCountryYear.country_id == country_id)
+            .all()
             if country_id
-            else db_session.query(green_growth_db.GGCountryYear).filter(
-                green_growth_db.GGCountryYear.year == year
-            )
+            else db_session.query(green_growth_db.GGCountryYear)
+            .filter(green_growth_db.GGCountryYear.year == year)
+            .all()
         )
 
     def resolve_gg_cluster_country_year_list(self, info, cluster_id, country_id, year):
@@ -215,6 +209,7 @@ class GreenGrowthQuery(graphene.ObjectType):
             .filter(green_growth_db.GGClusterCountryYear.cluster_id == cluster_id)
             .filter(green_growth_db.GGClusterCountryYear.country_id == country_id)
             .filter(green_growth_db.GGClusterCountryYear.year == year)
+            .all()
         )
 
     def resolve_gg_cpy_list(self, info, year, country_id):
@@ -222,6 +217,7 @@ class GreenGrowthQuery(graphene.ObjectType):
             db_session.query(green_growth_db.GGCountryProductYear)
             .filter(green_growth_db.GGCountryProductYear.year == year)
             .filter(green_growth_db.GGCountryProductYear.country_id == country_id)
+            .all()
         )
 
     def resolve_gg_cpysc_list(self, info, year, country_id):
@@ -235,19 +231,19 @@ class GreenGrowthQuery(graphene.ObjectType):
         )
 
     def resolve_gg_product_list(self, info, **args):
-        return db_session.query(green_growth_db.GGProduct)
+        return db_session.query(green_growth_db.GGProduct.all())
 
     def resolve_gg_location_country_list(self, info, **args):
-        return db_session.query(green_growth_db.GGLocationCountry)
+        return db_session.query(green_growth_db.GGLocationCountry.all())
 
     def resolve_gg_cluster_list(self, info, **args):
-        return db_session.query(green_growth_db.GGCluster)
+        return db_session.query(green_growth_db.GGCluster.all())
 
     def resolve_gg_location_region_list(self, info, **args):
-        return db_session.query(green_growth_db.GGLocationRegion)
+        return db_session.query(green_growth_db.GGLocationRegion.all())
 
     def resolve_gg_supply_chain_list(self, info, **args):
-        return db_session.query(green_growth_db.GGSupplyChain)
+        return db_session.query(green_growth_db.GGSupplyChain.all())
 
     def resolve_gg_supply_chain_cluster_product_member_list(self, info, **args):
-        return db_session.query(green_growth_db.GGSupplyChainClusterProductMember)
+        return db_session.query(green_growth_db.GGSupplyChainClusterProductMember.all())

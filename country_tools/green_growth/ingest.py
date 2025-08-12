@@ -19,7 +19,7 @@ INGESTION_ATTRS = {
     # "output_dir": "/n/hausmann_lab/lab/ellie/green_growth/output/",
     "input_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/green_growth/data/input/",
     "output_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/green_growth/data/output/",
-    "last_updated": "2025_07_22",
+    "last_updated": "2025_07_25",
     "product_classification": "hs12",
     "product_level": 4,
 }
@@ -269,7 +269,7 @@ def run(ingestion_attrs):
     # to do country_id, regioncode link to country
     # QUESTION: how many countries are in rock song?
     # TODO: if rock song is at country level then make part of country table
-    rock_song = GreenGrowth.load_csv(
+    rock_song = GreenGrowth.load_parquet(
         FILE_NAME_MAP["rock_song"], GreenGrowth.last_updated
     )
 
@@ -371,10 +371,6 @@ def run(ingestion_attrs):
     cluster_country_year = GreenGrowth.load_parquet(
         FILE_NAME_MAP["cluster_country_year"], GreenGrowth.last_updated
     )
-
-    import pdb
-
-    pdb.set_trace()
 
     cluster = cluster_country_year[["cluster_id", "cluster_name"]]
     cluster = cluster.drop_duplicates()
