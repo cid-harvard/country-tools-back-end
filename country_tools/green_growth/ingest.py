@@ -19,7 +19,7 @@ INGESTION_ATTRS = {
     # "output_dir": "/n/hausmann_lab/lab/ellie/green_growth/output/",
     "input_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/green_growth/data/input/",
     "output_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/green_growth/data/output/",
-    "last_updated": "2025_07_25",
+    "last_updated": "2025_08_29",
     "product_classification": "hs12",
     "product_level": 4,
 }
@@ -56,10 +56,7 @@ def run(ingestion_attrs):
 
     # supply chain classification
     supply_chain = (
-        sc_cluster_product["supply_chain"]
-        .drop_duplicates()
-        .reset_index(drop=True)
-        .reset_index()
+        hexbin["supply_chain"].drop_duplicates().reset_index(drop=True).reset_index()
     )
     supply_chain = supply_chain.rename(columns={"index": "supply_chain_id"})
 
@@ -105,6 +102,13 @@ def run(ingestion_attrs):
     sc_cluster_product = sc_cluster_product.rename(
         columns={"HS2012_4dg": "product_code", "dominant_cluster": "cluster_id"}
     )
+    hexbin = hexbin.rename(columns={"HS2012": "product_code"})
+
+    sc_cluster_product = sc_cluster_product.merge(
+        hexbin[["product_code", "supply_chain"]],
+        on="product_code",
+        how="left",
+    )
     sc_cluster_product = sc_cluster_product[
         ["supply_chain", "product_code", "cluster_id"]
     ]
@@ -131,7 +135,10 @@ def run(ingestion_attrs):
             how="inner",
         )
         .merge(
-            prod[["product_id", "code"]], left_on="HS2012", right_on="code", how="inner"
+            prod[["product_id", "code"]],
+            left_on="product_code",
+            right_on="code",
+            how="inner",
         )
         .merge(
             supply_chain[["supply_chain_id", "supply_chain"]],
@@ -149,7 +156,8 @@ def run(ingestion_attrs):
         ["year", "country_id", "product_id", "supply_chain_id", "product_ranking"]
     ]
 
-    hexbin = hexbin[["year", "country_id", "product_id", "normalized_export_rca"]]
+    hexbin = hexbin[["year", "country_id", "product_id", "export_rca"]]
+    # hexbin = hexbin[["year", "country_id", "product_id", "normalized_export_rca"]]
     hexbin = hexbin.drop_duplicates(subset=["year", "country_id", "product_id"])
     hexbin = hexbin.rename(columns={"normalized_export_rca": "export_rca"})
 
@@ -254,15 +262,8 @@ def run(ingestion_attrs):
 
     if not cpy[cpy.duplicated(subset=["year", "country_id", "product_id"])].empty:
         logging.warning("cpy has duplicates")
-        import pdb
-
-        pdb.set_trace()
     missing_values = [col for col in cpy_metrics if cpy[col].isna().any().any()]
     if missing_values:
-        import pdb
-
-        pdb.set_trace()
-
         logging.warning(f"cpy has na values {missing_values}")
 
     # rock song
@@ -301,14 +302,8 @@ def run(ingestion_attrs):
 
     # handle missing values and duplicates
     if not rock_song[rock_song.duplicated(subset=["year", "country_id"])].empty:
-        import pdb
-
-        pdb.set_trace()
         raise ValueError("rock_song has duplicate iso values")
     if not rock_song[rock_song.year.isna()].empty:
-        import pdb
-
-        pdb.set_trace()
         rock_song = rock_song.dropna(subset=["year"])
         # raise ValueError("rock_song has na values in year")
         logging.warning("rock_song has na values in year")
@@ -330,6 +325,8 @@ def run(ingestion_attrs):
     spiders["country_id"] = spiders["country_id"].astype(int)
     spiders["product_id"] = spiders["product_id"].astype(int)
 
+    spiders = spiders.rename(columns={"cog": "normalized_cog", "pci": "normalized_pci"})
+
     spiders = spiders[
         [
             "year",
@@ -337,8 +334,10 @@ def run(ingestion_attrs):
             "country_id",
             "product_id",
             "global_market_share",
+            # "cog",
             "normalized_cog",
             "density",
+            # "pci",
             "normalized_pci",
             "hhi",
             "product_market_share",
@@ -377,7 +376,7 @@ def run(ingestion_attrs):
 
     cluster_country_year = cluster_country_year.rename(
         columns={
-            "export_rca": "rca",
+            "export_rca_std": "rca",
             "pci_std": "pci",
             "cog_std": "cog",
             "density_std": "density",
@@ -408,9 +407,6 @@ def run(ingestion_attrs):
     if not cluster_country_year[
         cluster_country_year.duplicated(subset=["year", "cluster_id", "country_id"])
     ].empty:
-        import pdb
-
-        pdb.set_trace()
         cluster_country_year = cluster_country_year.drop_duplicates(
             subset=["year", "cluster_id", "country_id"]
         )

@@ -13,8 +13,6 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship, foreign
 
-# from sqlalchemy.orm import relation, relationship, foreign
-
 
 class GGSupplyChainClusterProductMember(Base):
     __tablename__ = "supply_chain_cluster_product_member"
@@ -46,12 +44,10 @@ class GGCountryProductYear(Base):
     feasibility_std = Column(Float)
     pci_std = Column(Float)
     cog_std = Column(Float)
-    # introduced four strategies
     strategy_balanced_portfolio = Column(Float)
     strategy_long_jump = Column(Float)
     strategy_low_hanging_fruit = Column(Float)
-    strategy_frontier = Column(Float)  # green growth leaders
-
+    strategy_frontier = Column(Float)
     global_market_share = Column(Float)
     normalized_cog = Column(Float)
     density = Column(Float)
