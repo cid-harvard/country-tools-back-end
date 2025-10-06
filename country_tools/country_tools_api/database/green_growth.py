@@ -84,6 +84,8 @@ class GGCountryYear(Base):
     x_resid = Column(Float)
     policy_recommendation = Column(String)
     strategy = Column(String)
+    rank = Column(Integer)
+    ranking_metric = Column(String)
 
 
 class GGClusterCountryYear(Base):

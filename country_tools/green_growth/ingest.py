@@ -19,7 +19,7 @@ INGESTION_ATTRS = {
     # "output_dir": "/n/hausmann_lab/lab/ellie/green_growth/output/",
     "input_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/green_growth/data/input/",
     "output_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/green_growth/data/output/",
-    "last_updated": "2025_08_29",
+    "last_updated": "2025_10_06",
     "product_classification": "hs12",
     "product_level": 4,
 }
@@ -34,6 +34,7 @@ FILE_NAME_MAP = {
     "sc_cluster_product": "5_product_cluster_mapping",
     "cluster_country_year": "6_cluster_country_metrics",
     "rock_song": "7_green_rock_song",
+    "country_rankings": "9_country_rankings",
 }
 
 # create a dictionary of the strategy names and their descriptions
@@ -376,7 +377,7 @@ def run(ingestion_attrs):
 
     cluster_country_year = cluster_country_year.rename(
         columns={
-            "export_rca_std": "rca",
+            "export_rca_cluster": "rca",
             "pci_std": "pci",
             "cog_std": "cog",
             "density_std": "density",
@@ -428,6 +429,31 @@ def run(ingestion_attrs):
                 | cluster_country_year.rca.isna()
             ]
         )
+
+    # country rankings
+    country_rankings = GreenGrowth.load_parquet(
+        FILE_NAME_MAP["country_rankings"], GreenGrowth.last_updated
+    )
+    country_rankings = (
+        country[["country_id", "iso3_code"]].merge(
+            country_rankings, on="iso3_code", how="left"
+        )
+        # .drop(columns=["iso3_code"])
+    )
+    country_rankings = country_rankings.rename(
+        columns={"country_value": "ranking_metric", "country_rank": "rank"}
+    )
+
+    country_rankings = country_rankings[
+        [
+            "country_id",
+            "year",
+            "rank",
+            "ranking_metric",
+        ]
+    ]
+    country_rankings = country_rankings.drop_duplicates(subset=["country_id", "year"])
+    rock_song = rock_song.merge(country_rankings, on=["country_id", "year"], how="left")
 
     # check for inclusion at 4 digit level
     # combine assert into one?

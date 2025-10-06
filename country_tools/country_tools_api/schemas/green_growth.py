@@ -31,6 +31,8 @@ class GGCountryYear(graphene.ObjectType):
     x_resid = graphene.Float()
     policy_recommendation = graphene.String()
     strategy = graphene.String()
+    rank = graphene.Int()
+    ranking_metric = graphene.String()
 
 
 class GGCountryProductYear(graphene.ObjectType):
