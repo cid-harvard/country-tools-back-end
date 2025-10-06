@@ -233,19 +233,19 @@ class GreenGrowthQuery(graphene.ObjectType):
         )
 
     def resolve_gg_product_list(self, info, **args):
-        return db_session.query(green_growth_db.GGProduct.all())
+        return db_session.query(green_growth_db.GGProduct).all()
 
     def resolve_gg_location_country_list(self, info, **args):
-        return db_session.query(green_growth_db.GGLocationCountry.all())
+        return db_session.query(green_growth_db.GGLocationCountry).all()
 
     def resolve_gg_cluster_list(self, info, **args):
-        return db_session.query(green_growth_db.GGCluster.all())
+        return db_session.query(green_growth_db.GGCluster).all()
 
     def resolve_gg_location_region_list(self, info, **args):
-        return db_session.query(green_growth_db.GGLocationRegion.all())
+        return db_session.query(green_growth_db.GGLocationRegion).all()
 
     def resolve_gg_supply_chain_list(self, info, **args):
-        return db_session.query(green_growth_db.GGSupplyChain.all())
+        return db_session.query(green_growth_db.GGSupplyChain).all()
 
     def resolve_gg_supply_chain_cluster_product_member_list(self, info, **args):
-        return db_session.query(green_growth_db.GGSupplyChainClusterProductMember.all())
+        return db_session.query(green_growth_db.GGSupplyChainClusterProductMember).all()
