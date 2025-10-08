@@ -387,6 +387,9 @@ def run(ingestion_attrs):
             "strat_frontier": "strategy_frontier",
         }
     )
+    cluster_country_year['cluster_export_total']=cluster_country_year.groupby(['year','cluster_name'])['export_value'].transform("sum")
+    cluster_country_year['cluster_market_share']=cluster_country_year['export_value']/cluster_country_year['cluster_export_total']
+    
     cluster_country_year = cluster_country_year[
         [
             "year",
@@ -401,6 +404,7 @@ def run(ingestion_attrs):
             "strategy_long_jump",
             "strategy_low_hanging_fruit",
             "strategy_frontier",
+            "cluster_market_share",
             # "global_market_share",
         ]
     ]
