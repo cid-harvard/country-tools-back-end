@@ -90,6 +90,7 @@ class GGClusterCountryYear(graphene.ObjectType):
     strategy_low_hanging_fruit = graphene.Float()
     strategy_frontier = graphene.Float()
     cluster_market_share = graphene.Float()
+    global_market_share = graphene.Float()
 
 
 class GGSupplyChain(graphene.ObjectType):

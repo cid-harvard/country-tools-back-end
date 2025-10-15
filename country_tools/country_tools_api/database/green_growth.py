@@ -107,6 +107,7 @@ class GGClusterCountryYear(Base):
     strategy_low_hanging_fruit = Column(Float)
     strategy_frontier = Column(Float)
     cluster_market_share = Column(Float)
+    global_market_share = Column(Float)
 
 
 class GGSupplyChain(Base):
