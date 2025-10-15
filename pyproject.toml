@@ -19,7 +19,8 @@ werkzeug = "0.16.1"
 jinja2 = "2.11.3"
 markupsafe = "1.1.1"
 ipython = "^8.18.1"
-sqlalchemy = "2"
+sqlalchemy = "1.4"
+graphene-sqlalchemy = "^2.3.0"
 
 [tool.poetry.group.db]
 optional = true

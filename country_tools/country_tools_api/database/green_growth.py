@@ -14,162 +14,16 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship, foreign
 
 
-class GGSupplyChainClusterProductMember(Base):
-    __tablename__ = "supply_chain_cluster_product_member"
-    __table_args__ = (
-        PrimaryKeyConstraint("supply_chain_id", "cluster_id", "product_id"),
-        {"schema": "greenplexity"},
-    )
-    supply_chain_id = Column(
-        Integer, primary_key=True
-    )  # , ForeignKey('SupplyChain.supply_chain_id'))
-    product_id = Column(
-        Integer, primary_key=True
-    )  # , ForeignKey('Product.product_id'))
-    cluster_id = Column(Integer, primary_key=True)
-
-
-class GGCountryProductYear(Base):
-    __tablename__ = "country_product_year"
-    __table_args__ = (
-        PrimaryKeyConstraint("country_id", "product_id", "year"),
-        {"schema": "greenplexity"},
-    )
-    year = Column(Integer, primary_key=True)
-    country_id = Column(Integer, primary_key=True)
-    product_id = Column(Integer, primary_key=True)
-    export_rca = Column(Float)
-    export_value = Column(Float)
-    expected_exports = Column(Float)
-    feasibility_std = Column(Float)
-    pci_std = Column(Float)
-    cog_std = Column(Float)
-    strategy_balanced_portfolio = Column(Float)
-    strategy_long_jump = Column(Float)
-    strategy_low_hanging_fruit = Column(Float)
-    strategy_frontier = Column(Float)
-    global_market_share = Column(Float)
-    normalized_cog = Column(Float)
-    density = Column(Float)
-    normalized_pci = Column(Float)
-    product_market_share = Column(Float)
-    effective_number_of_exporters = Column(Float)
-    product_market_share_growth = Column(Float)
-
-
-class GGCountryProductYearSupplyChain(Base):
-    __tablename__ = "country_product_year_supply_chain"
-    __table_args__ = (
-        PrimaryKeyConstraint("country_id", "product_id", "year", "supply_chain_id"),
-        {"schema": "greenplexity"},
-    )
-    year = Column(Integer, primary_key=True)
-    country_id = Column(Integer, primary_key=True)
-    product_id = Column(Integer, primary_key=True)
-    supply_chain_id = Column(Integer, primary_key=True)
-    product_ranking = Column(Integer)
-
-
-class GGCountryYear(Base):
-    __tablename__ = "country_year"
-    __table_args__ = (
-        PrimaryKeyConstraint("country_id", "year"),
-        {"schema": "greenplexity"},
-    )
-    country_id = Column(Integer, primary_key=True)
-    year = Column(Integer, primary_key=True)
-    coi_green = Column(Float)
-    lntotnetnrexp_pc = Column(Float)
-    lnypc = Column(Float)
-    x_resid = Column(Float)
-    policy_recommendation = Column(String)
-    strategy = Column(String)
-    rank = Column(Integer)
-    ranking_metric = Column(String)
-
-
-class GGClusterCountryYear(Base):
-    __tablename__ = "cluster_country_year"
-    __table_args__ = (
-        PrimaryKeyConstraint("cluster_id", "country_id", "year"),
-        {"schema": "greenplexity"},
-    )
-    cluster_id = Column(Integer, primary_key=True)
-    country_id = Column(Integer, primary_key=True)
-    year = Column(Integer, primary_key=True)
-    pci = Column(Float)
-    cog = Column(Float)
-    density = Column(Float)
-    rca = Column(Float)
-    export_value = Column(Float)
-    strategy_balanced_portfolio = Column(Float)
-    strategy_long_jump = Column(Float)
-    strategy_low_hanging_fruit = Column(Float)
-    strategy_frontier = Column(Float)
-    cluster_market_share = Column(Float)
-    global_market_share = Column(Float)
-
-
 class GGSupplyChain(Base):
     __tablename__ = "supply_chain"
-    __table_args__ = ({"schema": "greenplexity"},)
+    __table_args__ = {"schema": "green_growth"}
     supply_chain_id = Column(Integer, primary_key=True)
-    supply_chain = Column(String)
-
-
-class GGCluster(Base):
-    __tablename__ = "cluster"
-    __table_args__ = ({"schema": "greenplexity"},)
-    cluster_id = Column(Integer, primary_key=True)
-    cluster_name = Column(String)
-    member_cluster = relationship(
-        "GGSupplyChainClusterProductMember",
-        primaryjoin=(
-            cluster_id == foreign(GGSupplyChainClusterProductMember.cluster_id)
-        ),
-    )
-
-
-class GGLocationRegion(Base):
-    __tablename__ = "location_region"
-    __table_args__ = ({"schema": "greenplexity"},)
-    region_id = Column(Integer, primary_key=True)
-    name = Column(String)
-    region_code = Column(String)
-    country_id = Column(Integer)
-
-
-class GGLocationCountry(Base):
-    __tablename__ = "location_country"
-    __table_args__ = ({"schema": "greenplexity"},)
-
-    country_id = Column(Integer, primary_key=True)
-    # location_level = Column(String(50))
-    name_en = Column(String(100))
-    name_short_en = Column(String(50))
-    name_es = Column(String(100))
-    name_short_es = Column(String(50))
-    iso3_code = Column(String(3))
-    iso2_code = Column(String(2))
-    legacy_location_id = Column(Integer)
-    name_abbr_en = Column(String(50))
-    the_prefix = Column(Boolean)
-    former_country = Column(Boolean)
-    rankings_override = Column(Boolean)
-    cp_override = Column(Boolean)
-    incomelevel_enum = Column(Text)
-    country_project = Column(Boolean)
-    parent_id = Column(Integer)
-    country = relationship(
-        "GGCountryProductYear",
-        primaryjoin=(country_id == foreign(GGCountryProductYear.country_id)),
-    )
+    supply_chain = Column(String, primary_key=True)
 
 
 class GGProduct(Base):
-    __tablename__ = "product_hs12"
-    __table_args__ = ({"schema": "greenplexity"},)
-
+    __tablename__ = "product"
+    __table_args__ = {"schema": "green_growth"}
     product_id = Column(Integer, primary_key=True)
     code = Column(String(6))
     name_en = Column(String)
@@ -179,3 +33,82 @@ class GGProduct(Base):
     product_id_hierarchy = Column(String)
     top_parent_id = Column(Integer)
     show_feasibility = Column(Boolean)
+
+
+class GGLocationCountry(Base):
+    __tablename__ = "location_country"
+    __table_args__ = {"schema": "green_growth"}
+    country_id = Column(Integer, primary_key=True)
+    name_en = Column(String(100))
+    name_short_en = Column(String(50))
+    name_es = Column(String(100))
+    name_short_es = Column(String(50))
+    iso3_code = Column(String(3))
+    iso2_code = Column(String(2))
+    legacy_location_id = Column(Integer)
+    parent_id = Column(Integer)
+    name_abbr_en = Column(String(50))
+    the_prefix = Column(Boolean)
+    former_country = Column(Boolean)
+    rankings_override = Column(Boolean)
+    cp_override = Column(Boolean)
+    incomelevel_enum = Column(Text)
+    country_project = Column(Boolean)
+
+
+class GGSupplyChainProductMember(Base):
+    __tablename__ = "supply_chain_product_member"
+    __table_args__ = {"schema": "green_growth"}
+    supply_chain_id = Column(Integer, primary_key=True)
+    product_id = Column(Integer, ForeignKey(GGProduct.product_id), primary_key=True)
+    supply_chain = relationship(
+        "GGSupplyChain",
+        primaryjoin=(supply_chain_id == foreign(GGSupplyChain.supply_chain_id)),
+    )
+    product = relationship(
+        "GGProduct",
+        primaryjoin=(product_id == foreign(GGProduct.product_id)),
+    )
+
+
+class GGCountryProductYear(Base):
+    __tablename__ = "country_product_year"
+    __table_args__ = {"schema": "green_growth"}
+    year = Column(Integer, primary_key=True)
+    country_id = Column(Integer, primary_key=True)
+    product_id = Column(Integer, primary_key=True)
+    export_rca = Column(Float)
+    normalized_export_rca = Column(Float)
+    export_value = Column(Float)
+    expected_exports = Column(Float)
+    normalized_pci = Column(Float)  # spider metrics (5)
+    normalized_cog = Column(Float)
+    feasibility = Column(Float)
+    effective_number_of_exporters = Column(Float)
+    market_growth = Column(Float)
+    pci_std = Column(Float)  # standardized values are for the scatterplot visualization
+    cog_std = Column(Float)
+    feasibility_std = Column(Float)
+    pci_cog_feasibility_composite = Column(Float)
+    location = relationship(
+        "GGLocationCountry",
+        primaryjoin=(country_id == foreign(GGLocationCountry.country_id)),
+    )
+    product = relationship(
+        "GGProduct",
+        primaryjoin=(product_id == foreign(GGProduct.product_id)),
+    )
+
+
+class GGCountryProductYearSupplyChain(Base):
+    __tablename__ = "country_product_year_supply_chain"
+    __table_args__ = {"schema": "green_growth"}
+    year = Column(Integer, primary_key=True)
+    country_id = Column(Integer, primary_key=True)
+    product_id = Column(Integer, ForeignKey(GGProduct.product_id), primary_key=True)
+    supply_chain_id = Column(Integer, primary_key=True)
+    product_ranking = Column(Integer)
+    location = relationship(
+        "GGLocationCountry",
+        primaryjoin=(country_id == foreign(GGLocationCountry.country_id)),
+    )
