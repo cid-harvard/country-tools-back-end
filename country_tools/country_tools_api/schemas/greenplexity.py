@@ -163,33 +163,33 @@ class GPProduct(graphene.ObjectType):
 
 class GreenplexityQuery(graphene.ObjectType):
     gp_product_list = graphene.List(GPProduct)
-    gp_product_list = graphene.List(GPLocationCountry)
-    gp_product_list = graphene.List(GPSupplyChain)
-    gp_product_list = graphene.List(
+    gp_location_country_list = graphene.List(GPLocationCountry)
+    gp_supply_chain_list = graphene.List(GPSupplyChain)
+    gp_supply_chain_cluster_product_member_list = graphene.List(
         GPSupplyChainClusterProductMember,
         supply_chain_id=graphene.Int(required=True),
         cluster_id=graphene.Int(required=False),
         product_id=graphene.Int(required=False),
     )
-    gp_product_list = graphene.List(GPCluster)
-    gp_product_list = graphene.List(GPLocationRegion)
-    gp_product_list = graphene.List(
+    gp_cluster_list = graphene.List(GPCluster)
+    gp_location_region_list = graphene.List(GPLocationRegion)
+    gp_cluster_country_year_list = graphene.List(
         GPClusterCountryYear,
         cluster_id=graphene.Int(required=False),
         country_id=graphene.Int(required=True),
         year=graphene.Int(required=True),
     )
-    gp_product_list = graphene.List(
+    gp_cpy_list = graphene.List(
         GPCountryProductYear,
         year=graphene.Int(required=True),
         country_id=graphene.Int(required=True),
     )
-    gp_product_list = graphene.List(
+    gp_cpysc_list = graphene.List(
         GPCountryProductYearSupplyChain,
         year=graphene.Int(required=True),
         country_id=graphene.Int(required=True),
     )
-    gp_product_list = graphene.List(
+    gp_country_year_list = graphene.List(
         GPCountryYear,
         year=graphene.Int(required=True),
         country_id=graphene.Int(required=False),
