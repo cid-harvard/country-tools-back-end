@@ -9,7 +9,7 @@ db_pass = os.environ.get("COUNTRY_TOOLS_DB_PASS")
 db_host = os.environ.get("COUNTRY_TOOLS_DB_HOST")
 db_name = os.environ.get("COUNTRY_TOOLS_DB_NAME")
 db_uri = f"postgresql://{db_user}:{db_pass}@{db_host}/{db_name}"
-engine = create_engine(db_uri, convert_unicode=True)
+engine = create_engine(db_uri)
 
 # Declarative base model to create database tables and classes
 Base = declarative_base()

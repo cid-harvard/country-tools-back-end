@@ -3,8 +3,8 @@ import pandas as pd
 from sqlalchemy import MetaData, event
 from sqlalchemy.schema import CreateSchema
 from pandas_to_postgres import DataFrameCopy
-from country_tools_api.database.base import engine, Base
-from country_tools_api.database.albania import (
+from country_tools.country_tools_api.database.base import engine, Base
+from country_tools.country_tools_api.database.albania import (
     AlbaniaNACEIndustry,
     AlbaniaCountry,
     AlbaniaFDIMarkets,

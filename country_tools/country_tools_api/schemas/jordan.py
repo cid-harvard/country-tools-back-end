@@ -2,8 +2,10 @@ import graphene
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from database.base import db_session
-from database import albania as albania_db, jordan as jordan_db
+from country_tools.country_tools_api.database.base import db_session
+from country_tools.country_tools_api.database import (
+    jordan as jordan_db,
+)
 
 from .util import sqlalchemy_filter
 
