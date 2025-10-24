@@ -12,17 +12,17 @@ from pandas_to_postgres import DataFrameCopy, ParquetCopy, cast_pandas
 
 from country_tools.country_tools_api.database.base import engine, Base
 
-from country_tools.country_tools_api.database.green_growth import (
-    GGCountryProductYear,
-    GGSupplyChain,
-    GGLocationCountry,
-    GGLocationRegion,
-    GGProduct,
-    GGSupplyChainClusterProductMember,
-    GGClusterCountryYear,
-    GGCountryYear,
-    GGCluster,
-    GGCountryProductYearSupplyChain,
+from country_tools.country_tools_api.database.greenplexity import (
+    GPCountryProductYear,
+    GPSupplyChain,
+    GPLocationCountry,
+    GPLocationRegion,
+    GPProduct,
+    GPSupplyChainClusterProductMember,
+    GPClusterCountryYear,
+    GPCountryYear,
+    GPCluster,
+    GPCountryProductYearSupplyChain,
 )
 from country_tools.green_growth.ingest import INGESTION_ATTRS
 
