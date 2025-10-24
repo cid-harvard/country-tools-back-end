@@ -1,6 +1,4 @@
 import graphene
-
-# from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 from country_tools.country_tools_api.database.base import db_session
