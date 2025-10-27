@@ -215,6 +215,7 @@ class GreenGrowthPipeline:
         self.country_rankings = self.GreenGrowth.load_parquet(
             FILE_NAME_MAP["country_rankings"], self.GreenGrowth.last_updated
         )
+        import pdb; pdb.set_trace()
         self.cluster_product_share = self.GreenGrowth.load_parquet(
             FILE_NAME_MAP["cluster_product_share"], self.GreenGrowth.last_updated
         )
