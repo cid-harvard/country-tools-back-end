@@ -52,6 +52,7 @@ class GPCountryProductYear(graphene.ObjectType):
     world_share_product = graphene.Float()
     world_share_product_relativepct = graphene.Float()
     world_share_product_pctpoint_change = graphene.Float()
+    country_world_share_product = graphene.Float()
     pci_std = graphene.Float()
     cog_std = graphene.Float()
     feasibility_std = graphene.Float()
