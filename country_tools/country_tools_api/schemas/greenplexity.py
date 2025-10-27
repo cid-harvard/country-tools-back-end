@@ -85,6 +85,7 @@ class GPClusterCountryYear(graphene.ObjectType):
     pci = graphene.Float()
     cog = graphene.Float()
     density = graphene.Float()
+    export_value = graphene.Float()
     export_rca_cluster = graphene.Float()
     strategy_balanced_portfolio = graphene.Float()
     strategy_long_jump = graphene.Float()
