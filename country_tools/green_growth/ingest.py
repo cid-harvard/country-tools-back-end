@@ -121,7 +121,7 @@ DATA_COLUMNS = {
             "supply_chain",
             "country_id",
             "product_id",
-            "global_market_share",
+            # "global_market_share",
             "normalized_cog",
             "density",
             "normalized_pci",

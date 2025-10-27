@@ -2,6 +2,7 @@
 # poetry add sqlalchemy@2
 # to get back to running api
 # poetry add sqlalchemy@1.4
+# poetry add graphene-sqlalchemy
 
 import pandas as pd
 import argparse
@@ -12,7 +13,6 @@ from pandas_to_postgres import DataFrameCopy, ParquetCopy, cast_pandas
 
 from country_tools.country_tools_api.database.base import engine, Base
 
-<<<<<<< HEAD
 from country_tools.country_tools_api.database.greenplexity import (
     GPCountryProductYear,
     GPSupplyChain,
@@ -24,15 +24,6 @@ from country_tools.country_tools_api.database.greenplexity import (
     GPCountryYear,
     GPCluster,
     GPCountryProductYearSupplyChain,
-=======
-from country_tools.country_tools_api.database.green_growth import (
-    GGCountryProductYear,
-    GGCountryProductYearSupplyChain,
-    GGSupplyChainProductMember,
-    GGSupplyChain,
-    GGLocationCountry,
-    GGProduct,
->>>>>>> master
 )
 from country_tools.green_growth.ingest import INGESTION_ATTRS
 
@@ -42,7 +33,6 @@ OUTPUT_DIR = os.path.join(
 )
 DATA_MODELS = [
     "country_product_year",
-<<<<<<< HEAD
     "country_year",
     "country_product_year_supply_chain",
     "supply_chain_cluster_product_member",
@@ -58,15 +48,6 @@ SCHEMA = "greenplexity"
 parser = argparse.ArgumentParser()
 parser.add_argument("--tables", nargs="+", default=DATA_MODELS)
 args = parser.parse_args()
-=======
-    "country_product_year_supply_chain",
-    "supply_chain_product_member",
-    "supply_chain",
-    "location_country",
-    "product",
-]
-SCHEMA = "green_growth"
->>>>>>> master
 
 
 def copy():
@@ -76,13 +57,9 @@ def copy():
     print(f"Database Connection: {engine}")
     print("****************************************")
 
-<<<<<<< HEAD
     import pdb
-
     pdb.set_trace()
 
-=======
->>>>>>> master
     with engine.connect() as conn:
         conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA};"))
         conn.commit()
@@ -94,12 +71,7 @@ def copy():
         meta = MetaData()
         meta.reflect(bind=conn, schema=SCHEMA)
 
-<<<<<<< HEAD
         for table in args.tables:
-=======
-        for table in DATA_MODELS:
-
->>>>>>> master
             ParquetCopy(
                 os.path.join(OUTPUT_DIR, f"{table}.parquet"),
                 conn=conn,

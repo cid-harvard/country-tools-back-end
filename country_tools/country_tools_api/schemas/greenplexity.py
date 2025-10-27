@@ -91,7 +91,7 @@ class GPClusterCountryYear(graphene.ObjectType):
     strategy_frontier = graphene.Float()
     country_share_cluster = graphene.Float()
     world_share_cluster = graphene.Float()
-    country_world_share_cluster
+    country_world_share_cluster = graphene.Float()
 
 
 class GPSupplyChain(graphene.ObjectType):
