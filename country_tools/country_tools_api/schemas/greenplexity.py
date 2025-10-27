@@ -49,9 +49,9 @@ class GPCountryProductYear(graphene.ObjectType):
     normalized_pci = graphene.Float()
     normalized_cog = graphene.Float()
     density = graphene.Float()
-    global_market_share = graphene.Float()
-    product_market_share_growth = graphene.Float()
-    product_market_share = graphene.Float()
+    world_share_product = graphene.Float()
+    world_share_product_relativepct = graphene.Float()
+    world_share_product_pctpoint_change = graphene.Float()
     pci_std = graphene.Float()
     cog_std = graphene.Float()
     feasibility_std = graphene.Float()
@@ -84,13 +84,14 @@ class GPClusterCountryYear(graphene.ObjectType):
     pci = graphene.Float()
     cog = graphene.Float()
     density = graphene.Float()
-    rca = graphene.Float()
+    export_rca_cluster = graphene.Float()
     strategy_balanced_portfolio = graphene.Float()
     strategy_long_jump = graphene.Float()
     strategy_low_hanging_fruit = graphene.Float()
     strategy_frontier = graphene.Float()
-    cluster_market_share = graphene.Float()
-    global_market_share = graphene.Float()
+    country_share_cluster = graphene.Float()
+    world_share_cluster = graphene.Float()
+    country_world_share_cluster
 
 
 class GPSupplyChain(graphene.ObjectType):

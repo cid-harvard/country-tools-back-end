@@ -21,7 +21,7 @@ INGESTION_ATTRS = {
     # "output_dir": "/n/hausmann_lab/lab/ellie/green_growth/output/",
     "input_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/green_growth/data/input/",
     "output_dir": "/home/parallels/Desktop/Parallels Shared Folders/AllFiles/Users/ELJ479/projects/green_growth/data/output/",
-    "last_updated": "2025_10_14",
+    "last_updated": "2025_10_26",
     "product_classification": "hs12",
     "product_level": 4,
 }
@@ -35,6 +35,7 @@ FILE_NAME_MAP = {
     "spiders": "4_spiders",
     "sc_cluster_product": "5_product_cluster_mapping",
     "cluster_country_year": "6_cluster_country_metrics",
+    "cluster_product_share": "6B_cluster_product_share",
     "rock_song": "7_green_rock_song",
     "country_rankings": "9_country_rankings",
 }
@@ -121,14 +122,21 @@ DATA_COLUMNS = {
             "country_id",
             "product_id",
             "global_market_share",
-            # "cog",
             "normalized_cog",
             "density",
-            # "pci",
             "normalized_pci",
-            "hhi",
-            "product_market_share",
-            "product_mkt_share_relativepct",
+            # "hhi",
+            "world_share_product",
+            "world_share_product_pctpoint_change",
+            "world_share_product_relativepct",
+            # "product_market_share",
+            # "product_mkt_share_relativepct",
+        ],
+        "cluster_product_share" :[
+            "year",
+            "country_id",
+            "product_id",
+            "country_world_share_product",
         ],
         "cluster_country_year" :[
             "year",
@@ -137,14 +145,15 @@ DATA_COLUMNS = {
             "pci",
             "cog",
             "density",
-            "rca",
+            "export_rca_cluster",
             "export_value",
             "strategy_balanced_portfolio",
             "strategy_long_jump",
             "strategy_low_hanging_fruit",
             "strategy_frontier",
-            "cluster_market_share",
-            "global_market_share",
+            "country_share_cluster",
+            "world_share_cluster",
+            "country_world_share_cluster",
         ],
         "country_rankings" :[
             "country_id",
@@ -205,6 +214,9 @@ class GreenGrowthPipeline:
         )
         self.country_rankings = self.GreenGrowth.load_parquet(
             FILE_NAME_MAP["country_rankings"], self.GreenGrowth.last_updated
+        )
+        self.cluster_product_share = self.GreenGrowth.load_parquet(
+            FILE_NAME_MAP["cluster_product_share"], self.GreenGrowth.last_updated
         )
 
     def handle_classifications(self):
@@ -351,14 +363,9 @@ class GreenGrowthPipeline:
         self.spiders = self.spiders.explode("supply_chain").reset_index(drop=True)
         self.spiders["country_id"] = self.spiders["country_id"].astype(int)
         self.spiders["product_id"] = self.spiders["product_id"].astype(int)
-
         self.spiders = self.spiders.rename(columns={"cog": "normalized_cog", "pci": "normalized_pci"})
-
+        # self.spiders = self.spiders.rename(columns={"hhi": "effective_number_of_exporters"})
         self.spiders = self.spiders[DATA_COLUMNS["spiders"]]
-        self.spiders = self.spiders.rename(columns={"hhi": "effective_number_of_exporters"})
-        self.spiders = self.spiders.rename(
-            columns={"product_mkt_share_relativepct": "product_market_share_growth"}
-        )
 
         if not self.spiders[
             self.spiders.duplicated(subset=["year", "supply_chain", "country_id", "product_id"])
@@ -375,6 +382,13 @@ class GreenGrowthPipeline:
         self.spiders = self.spiders.drop(columns=["supply_chain_id"])
         self.spiders = self.spiders.drop_duplicates(subset=["year", "country_id", "product_id"])
         self.cpy = self.cpy.merge(self.spiders, on=["year", "country_id", "product_id"], how="outer")
+
+        # cluster product share
+        self.cluster_product_share = self.cluster_product_share[self.cluster_product_share.green_product_flag==1]
+        self.cluster_product_share["country_id"] = self.cluster_product_share["country_id"].astype(int)
+        self.cluster_product_share = self.cluster_product_share.merge(self.prod[["product_id", "code"]], left_on="HS2012", right_on="code", how="left")
+        self.cluster_product_share =  self.cluster_product_share[DATA_COLUMNS["cluster_product_share"]]
+        self.cpy = self.cpy.merge(self.cluster_product_share, on=["year", "country_id", "product_id"], how="left")
 
     def determine_clusters(self):
         """
@@ -418,11 +432,10 @@ class GreenGrowthPipeline:
 
 
     def prepare_cluster_country_year(self):
-        import pdb; pdb.set_trace()
         self.cluster_country_year = self.cluster_country_year.rename(
             columns={
-                "country_cluster_share": "cluster_market_share",
-                "export_rca_cluster": "rca",
+                # "country_share_cluster": "cluster_market_share",
+                # "export_rca_cluster": "rca",
                 "pci_std": "pci",
                 "cog_std": "cog",
                 "density_std": "density",
@@ -430,14 +443,14 @@ class GreenGrowthPipeline:
                 "strat_long_jump": "strategy_long_jump",
                 "strat_low_hang_fruit": "strategy_low_hanging_fruit",
                 "strat_frontier": "strategy_frontier",
-                "world_cluster_share": "global_market_share"
+                # "world_share_cluster": "global_market_share"
             }
         )
         
         self.cluster_country_year = self.cluster_country_year[
             DATA_COLUMNS["cluster_country_year"]
         ]
-        import pdb; pdb.set_trace()
+
 
     def validate_data(self):
         if not self.cpy[self.cpy.duplicated(subset=["year", "country_id", "product_id"])].empty:
@@ -473,7 +486,7 @@ class GreenGrowthPipeline:
             self.cluster_country_year.pci.isna()
             | self.cluster_country_year.cog.isna()
             | self.cluster_country_year.density.isna()
-            | self.cluster_country_year.rca.isna()
+            | self.cluster_country_year.export_rca_cluster.isna()
         ].empty:
             logging.warning(
                 "cluster_country_year has na values in pci, cog, density, or rca"
@@ -511,7 +524,6 @@ class GreenGrowthPipeline:
 
 
     def save_data(self):
-        import pdb; pdb.set_trace()
         # save self.GreenGrowth data to output directory
         self.GreenGrowth.save_parquet(self.supply_chain, "supply_chain")
         self.GreenGrowth.save_parquet(self.country, "location_country")

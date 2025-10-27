@@ -48,13 +48,13 @@ class GPCountryProductYear(Base):
     strategy_long_jump = Column(Float)
     strategy_low_hanging_fruit = Column(Float)
     strategy_frontier = Column(Float)
-    global_market_share = Column(Float)
     normalized_cog = Column(Float)
     density = Column(Float)
     normalized_pci = Column(Float)
-    product_market_share = Column(Float)
-    effective_number_of_exporters = Column(Float)
-    product_market_share_growth = Column(Float)
+    world_share_product = Column(Float)
+    world_share_product_pctpoint_change = Column(Float)
+    world_share_product_relativepct = Column(Float)
+    country_world_share_product = Column(Float)
 
 
 class GPCountryProductYearSupplyChain(Base):
@@ -100,14 +100,15 @@ class GPClusterCountryYear(Base):
     pci = Column(Float)
     cog = Column(Float)
     density = Column(Float)
-    rca = Column(Float)
+    export_rca_cluster = Column(Float)
     export_value = Column(Float)
     strategy_balanced_portfolio = Column(Float)
     strategy_long_jump = Column(Float)
     strategy_low_hanging_fruit = Column(Float)
     strategy_frontier = Column(Float)
-    cluster_market_share = Column(Float)
-    global_market_share = Column(Float)
+    country_share_cluster = Column(Float)
+    world_share_cluster = Column(Float)
+    country_world_share_cluster = Column(Float)
 
 
 class GPSupplyChain(Base):
