@@ -170,17 +170,17 @@ class GreenplexityQuery(graphene.ObjectType):
     gp_supply_chain_list = graphene.List(GPSupplyChain)
     gp_supply_chain_cluster_product_member_list = graphene.List(
         GPSupplyChainClusterProductMember,
-        supply_chain_id=graphene.Int(required=True),
         cluster_id=graphene.Int(required=False),
         product_id=graphene.Int(required=False),
+        supply_chain_id=graphene.Int(required=False),
     )
     gp_cluster_list = graphene.List(GPCluster)
     gp_location_region_list = graphene.List(GPLocationRegion)
     gp_cluster_country_year_list = graphene.List(
         GPClusterCountryYear,
-        cluster_id=graphene.Int(required=False),
-        country_id=graphene.Int(required=True),
         year=graphene.Int(required=True),
+        cluster_id=graphene.Int(required=False),
+        country_id=graphene.Int(required=False),
     )
     gp_cpy_list = graphene.List(
         GPCountryProductYear,
@@ -194,30 +194,32 @@ class GreenplexityQuery(graphene.ObjectType):
     )
     gp_country_year_list = graphene.List(
         GPCountryYear,
-        year=graphene.Int(required=True),
         country_id=graphene.Int(required=False),
+        year=graphene.Int(required=False),
     )
 
-    def resolve_gp_country_year_list(self, info, year, country_id=None):
-        return (
-            db_session.query(greenplexity_db.GPCountryYear)
-            .filter(greenplexity_db.GPCountryYear.year == year)
-            .filter(greenplexity_db.GPCountryYear.country_id == country_id)
-            .all()
-            if country_id
-            else db_session.query(greenplexity_db.GPCountryYear)
-            .filter(greenplexity_db.GPCountryYear.year == year)
-            .all()
-        )
+    def resolve_gp_country_year_list(self, info, country_id=None, year=None):
+        query = db_session.query(greenplexity_db.GPCountryYear)
+        if year is not None:
+            query = query.filter(greenplexity_db.GPCountryYear.year == year)
+        if country_id is not None:
+            query = query.filter(greenplexity_db.GPCountryYear.country_id == country_id)
+        return query.all()
 
-    def resolve_gp_cluster_country_year_list(self, info, cluster_id, country_id, year):
-        return (
-            db_session.query(greenplexity_db.GPClusterCountryYear)
-            .filter(greenplexity_db.GPClusterCountryYear.cluster_id == cluster_id)
-            .filter(greenplexity_db.GPClusterCountryYear.country_id == country_id)
-            .filter(greenplexity_db.GPClusterCountryYear.year == year)
-            .all()
-        )
+    def resolve_gp_cluster_country_year_list(
+        self, info, year, cluster_id=None, country_id=None
+    ):
+        query = db_session.query(greenplexity_db.GPClusterCountryYear)
+        if cluster_id is not None:
+            query = query.filter(
+                greenplexity_db.GPClusterCountryYear.cluster_id == cluster_id
+            )
+        if country_id is not None:
+            query = query.filter(
+                greenplexity_db.GPClusterCountryYear.country_id == country_id
+            )
+        query = query.filter(greenplexity_db.GPClusterCountryYear.year == year)
+        return query.all()
 
     def resolve_gp_cpy_list(self, info, year, country_id):
         return (
@@ -252,5 +254,23 @@ class GreenplexityQuery(graphene.ObjectType):
     def resolve_gp_supply_chain_list(self, info, **args):
         return db_session.query(greenplexity_db.GPSupplyChain).all()
 
-    def resolve_gp_supply_chain_cluster_product_member_list(self, info, **args):
-        return db_session.query(greenplexity_db.GPSupplyChainClusterProductMember).all()
+    def resolve_gp_supply_chain_cluster_product_member_list(
+        self, info, cluster_id=None, product_id=None, supply_chain_id=None
+    ):
+        query = db_session.query(greenplexity_db.GPSupplyChainClusterProductMember)
+        if supply_chain_id is not None:
+            query = db_session.query(
+                greenplexity_db.GPSupplyChainClusterProductMember.supply_chain_id
+                == supply_chain_id
+            )
+        if cluster_id is not None:
+            query = db_session.query(
+                greenplexity_db.GPSupplyChainClusterProductMember.cluster_id
+                == cluster_id
+            )
+        if product_id is not None:
+            query = db_session.query(
+                greenplexity_db.GPSupplyChainClusterProductMember.product_id
+                == product_id
+            )
+        return query.all()
