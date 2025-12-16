@@ -24,7 +24,7 @@ app.add_url_rule(
 @app.route("/sitemap")
 @app.route("/sitemap.xml")
 def sitemap():
-    update_date = "2025-11-20"
+    update_date = "2025-12-16"
     return generate_sitemap(update_date)
 
 
